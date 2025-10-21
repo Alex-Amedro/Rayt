@@ -9,6 +9,9 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-std=c++17",
+                "-Wall",
+                "-Wextra",
+                "-Wpedantic",
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
@@ -23,7 +26,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Compiler: /usr/bin/g++ (C++17 with debug)"
+            "detail": "Compiler: /usr/bin/g++ (C++17 pedantic mode)"
         },
         {
             "type": "cppbuild",
@@ -33,6 +36,9 @@
                 "-fdiagnostics-color=always",
                 "-O3",
                 "-std=c++17",
+                "-Wall",
+                "-Wextra",
+                "-Wpedantic",
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
@@ -44,7 +50,7 @@
                 "$gcc"
             ],
             "group": "build",
-            "detail": "Compiler: /usr/bin/g++ (C++17 optimized)"
+            "detail": "Compiler: /usr/bin/g++ (C++17 optimized pedantic)"
         },
         {
             "type": "shell",
