@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        ".als.json": "jsonc",
         "*.cpp": "cpp",
         "*.h": "cpp",
         "*.hpp": "cpp",
@@ -46,7 +47,9 @@
         "numbers": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "optional": "cpp",
+        "fstream": "cpp"
     },
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.cStandard": "c17",
