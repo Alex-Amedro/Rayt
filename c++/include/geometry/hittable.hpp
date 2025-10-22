@@ -1,5 +1,5 @@
 #pragma once
-#include "vec3.hpp"
+#include "core/vec3.hpp"
 #include <memory>
 
 class material;

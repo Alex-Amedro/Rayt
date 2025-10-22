@@ -1,7 +1,7 @@
 #pragma once
-#include "hittable.hpp"
-#include "vec3.hpp"
-#include "material.hpp"
+#include "geometry/hittable.hpp"
+#include "core/vec3.hpp"
+#include "materials/material.hpp"
 #include <memory>
 
 // Infinite plane primitive

@@ -1,6 +1,6 @@
 #pragma once
-#include "vec3.hpp"
-#include "hittable.hpp"
+#include "core/vec3.hpp"
+#include "geometry/hittable.hpp"
 
 // Abstract base class for materials
 class material {

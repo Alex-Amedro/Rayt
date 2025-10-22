@@ -1,6 +1,6 @@
 #pragma once
-#include "material.hpp"
-#include "vec3.hpp"
+#include "materials/material.hpp"
+#include "core/vec3.hpp"
 
 vec3 random_unit_vector();
 

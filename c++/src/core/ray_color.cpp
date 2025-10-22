@@ -1,7 +1,7 @@
-#include "ray_color.hpp"
-#include "vec3.hpp"
-#include "hittable.hpp"
-#include "material.hpp"
+#include "core/ray_color.hpp"
+#include "core/vec3.hpp"
+#include "geometry/hittable.hpp"
+#include "materials/material.hpp"
 #include <vector>
 #include <memory>
 #include <limits>

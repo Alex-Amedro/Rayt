@@ -11,6 +11,7 @@ public:
     double length_squared() const;
     vec3 normalize() const;
     double dot(const vec3& other) const;
+    vec3 cross(const vec3& other) const;
     
     vec3 operator+(const vec3& other) const;
     vec3 operator-(const vec3& other) const;

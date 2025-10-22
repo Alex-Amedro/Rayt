@@ -1,6 +1,6 @@
-#include "plane.hpp"
-#include "vec3.hpp"
-#include "hittable.hpp"
+#include "geometry/plane.hpp"
+#include "geometry/hittable.hpp"
+#include "core/vec3.hpp"
 #include <cmath>
 #include <memory>
 

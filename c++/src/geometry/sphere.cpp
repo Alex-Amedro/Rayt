@@ -1,6 +1,6 @@
-#include "sphere.hpp"
-#include "vec3.hpp"
-#include "hittable.hpp"
+#include "geometry/sphere.hpp"
+#include "geometry/hittable.hpp"
+#include "core/vec3.hpp"
 #include <cmath>
 #include <algorithm>
 #include <memory>

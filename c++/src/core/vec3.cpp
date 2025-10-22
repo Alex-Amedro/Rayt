@@ -1,4 +1,4 @@
-#include "vec3.hpp"
+#include "core/vec3.hpp"
 #include <cmath>
 #include <random>
 
@@ -20,6 +20,14 @@ vec3 vec3::normalize() const {
     double length = std::sqrt(this->length_squared());
     if (length == 0.0) return vec3(0.0, 0.0, 0.0);
     return vec3(this->x / length, this->y / length, this->z / length);
+}
+
+vec3 vec3::cross(const vec3& other) const {
+    return vec3(
+        this->y * other.z - this->z * other.y,
+        this->z * other.x - this->x * other.z,
+        this->x * other.y - this->y * other.x
+    );
 }
 
 // Arithmetic operators
