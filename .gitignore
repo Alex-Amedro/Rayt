@@ -4,6 +4,13 @@
 *.app
 test
 a.out
+rayt
+
+# Generated images (PPM files are huge!)
+*.ppm
+*.png
+*.jpg
+*.jpeg
 
 # Compiled Object files
 *.o
@@ -49,6 +56,9 @@ Makefile
 *.cmake
 build/
 out/
+
+# Object files directory
+c++/obj/
 
 # Dependencies
 *.d
