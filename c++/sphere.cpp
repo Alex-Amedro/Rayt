@@ -1,13 +1,12 @@
+#include "sphere.hpp"
 #include "vec3.hpp"
 #include "hittable.hpp"
-#include "sphere.hpp"
 #include <cmath>
 #include <algorithm>
 #include <memory>
 
-sphere::sphere(vec3 origin, double radius, std::shared_ptr<material> material) {
-    this->origin = origin;
-    this->radius = radius;
+sphere::sphere(vec3 origin, double radius, std::shared_ptr<material> material) 
+    : origin(origin), radius(radius) {
     this->mat = material;
 }
 
@@ -22,9 +21,7 @@ double sphere::hit(const vec3& ray_origin, const vec3& ray_direction) {
     double c = oc.dot(oc) - this->radius * this->radius;
     double delta = b * b - 4.0 * a * c;
     
-    if (delta < 0.0) {
-        return -1.0;
-    }
+    if (delta < 0.0) return -1.0;
     
     double t1 = (-b - std::sqrt(delta)) / (2.0 * a);
     double t2 = (-b + std::sqrt(delta)) / (2.0 * a);
@@ -33,7 +30,6 @@ double sphere::hit(const vec3& ray_origin, const vec3& ray_direction) {
         return (t2 > epsilon) ? std::min(t1, t2) : t1;
     } else if (t2 > epsilon) {
         return t2;
-    } else {
-        return -1.0;
     }
+    return -1.0;
 }

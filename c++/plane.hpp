@@ -1,9 +1,10 @@
 #pragma once
 #include "hittable.hpp"
 #include "vec3.hpp"
-#include <memory>
 #include "material.hpp"
+#include <memory>
 
+// Infinite plane primitive
 class plane : public hittable {
 public:
     vec3 anchor;

@@ -1,10 +1,10 @@
 #pragma once
 #include "vec3.hpp"
 #include "hittable.hpp"
-#include <algorithm>
-#include <memory>
 #include "material.hpp"
+#include <memory>
 
+// Sphere primitive
 class sphere : public hittable {
 public:
     vec3 origin;

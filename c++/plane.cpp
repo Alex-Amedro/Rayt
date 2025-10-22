@@ -1,13 +1,11 @@
 #include "plane.hpp"
-#include <cmath>
 #include "vec3.hpp"
 #include "hittable.hpp"
+#include <cmath>
 #include <memory>
 
-
-plane::plane(const vec3& anchor, const vec3& normal, std::shared_ptr<material> mat) {
-    this->anchor = anchor;
-    this->normal = normal.normalize();
+plane::plane(const vec3& anchor, const vec3& normal, std::shared_ptr<material> mat) 
+    : anchor(anchor), normal(normal.normalize()) {
     this->mat = mat;
 }
 

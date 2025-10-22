@@ -14,29 +14,31 @@
 #include "diffuse.hpp"
 #include "material.hpp"
 #include "ray_color.hpp"
-
+#include "metal.hpp"    
 
 int main() {
 
-    // image
-    const double aspect_ratio = 16.0 / 9.0;
-    const int image_width = 800;
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 5;
+    // Image configuration
+    const int image_width = 1920;   
+    const int image_height = 1080;  
+    const double aspect_ratio = static_cast<double>(image_width) / image_height;
+    const int samples_per_pixel = 300;  
     const int max_depth = 50;
 
-    //color
-    auto mat_sol = std::make_shared<diffuse>(vec3(150, 150, 150));
-    auto mat_sphere1 = std::make_shared<diffuse>(vec3(255, 0, 0));
-    auto mat_sphere2 = std::make_shared<diffuse>(vec3(0, 255, 0));
+    // Materials setup
+    auto mat_ground = std::make_shared<diffuse>(vec3(128, 128, 128));     
+    auto mat_center = std::make_shared<metal>(vec3(255, 255, 255), 0.0);  
+    auto mat_left = std::make_shared<diffuse>(vec3(255, 0, 0));            
+    auto mat_right = std::make_shared<metal>(vec3(200, 150, 50), 0.1);    
 
-    // scene
+    // Scene objects
     std::vector<std::shared_ptr<hittable>> scene_objects;
-    scene_objects.push_back(std::make_shared<sphere>(vec3(0, 0, -1), 0.5, mat_sphere1));
-    scene_objects.push_back(std::make_shared<sphere>(vec3(-1, 0, -1.5), 0.5, mat_sphere2));
-    scene_objects.push_back(std::make_shared<plane>(vec3(0, -0.5, -1), vec3(0, 1, 0), mat_sol));
+    scene_objects.push_back(std::make_shared<plane>(vec3(0, -1, 0), vec3(0, 1, 0), mat_ground)); 
+    scene_objects.push_back(std::make_shared<sphere>(vec3(0, 0, -3), 1.0, mat_center));           
+    scene_objects.push_back(std::make_shared<sphere>(vec3(-2.5, 0, -3), 1.0, mat_left));         
+    scene_objects.push_back(std::make_shared<sphere>(vec3(2.5, 0, -3), 1.0, mat_right));         
     
-    //camera
+    // Camera setup
     vec3 camera_origin(0, 0, 0);
     double viewport_height = 2.0;
     double viewport_width = aspect_ratio * viewport_height;
@@ -46,25 +48,24 @@ int main() {
     vec3 vertical(0, viewport_height, 0);
     vec3 lower_left_corner = camera_origin - (horizontal / 2) - (vertical / 2) - vec3(0, 0, focal_length);
 
-    //anti-aliasing Random
+    // Random number generator for anti-aliasing
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    //file output
+    // Output file
     std::ofstream file("image.ppm");
     file << "P3\n" << image_width << " " << image_height << "\n255\n";
 
+    // Render loop
     for (int y = image_height - 1; y >= 0; --y) {
-
-        std::cout << "\rLignes restantes: " << y << " " << std::flush; 
+        std::cout << "\rLines remaining: " << y << " " << std::flush; 
 
         for (int x = 0; x < image_width; ++x) {
-
             vec3 total_color(0, 0, 0);
 
+            // Anti-aliasing: sample multiple rays per pixel
             for (int s = 0; s < samples_per_pixel; ++s) {
-
                 double u = (double(x) + distribution(generator)) / (image_width - 1);
                 double v = (double(y) + distribution(generator)) / (image_height - 1);
 
@@ -74,24 +75,29 @@ int main() {
                 total_color = total_color + pixel_color;
             }
 
-            // Fais la moyenne (double / int -> double)
+            // Average color across all samples
             vec3 avg_color = total_color / samples_per_pixel;
 
-            // N'OUBLIE PAS la correction gamma (cruciale !)
-            avg_color.x = std::sqrt(avg_color.x / 255.0) * 255.0;
-            avg_color.y = std::sqrt(avg_color.y / 255.0) * 255.0;
-            avg_color.z = std::sqrt(avg_color.z / 255.0) * 255.0;
+            // Normalize to [0, 1] for gamma correction
+            avg_color.x = avg_color.x / 255.0;
+            avg_color.y = avg_color.y / 255.0;
+            avg_color.z = avg_color.z / 255.0;
 
-            // Convertis en 'int' UNE SEULE FOIS, à la fin
-            int r = static_cast<int>(avg_color.x);
-            int g = static_cast<int>(avg_color.y);
-            int b = static_cast<int>(avg_color.z);
+            // Gamma correction (gamma = 2.0)
+            avg_color.x = std::sqrt(avg_color.x);
+            avg_color.y = std::sqrt(avg_color.y);
+            avg_color.z = std::sqrt(avg_color.z);
 
+            // Convert to [0, 255] with clamping
+            int r = static_cast<int>(256.0 * std::clamp(avg_color.x, 0.0, 0.999));
+            int g = static_cast<int>(256.0 * std::clamp(avg_color.y, 0.0, 0.999));
+            int b = static_cast<int>(256.0 * std::clamp(avg_color.z, 0.0, 0.999));
+            
             file << r << " " << g << " " << b << "\n";
         }
     }
     
-    std::cout << "\nTermine.\n";
+    std::cout << "\nDone.\n";
     file.close();
     return 0;
 }

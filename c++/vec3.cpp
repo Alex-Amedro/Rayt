@@ -2,14 +2,12 @@
 #include <cmath>
 #include <random>
 
+// Constructors
 vec3::vec3() : x(0.0), y(0.0), z(0.0) {}
 
-vec3::vec3(double x, double y, double z) {
-    this->x = x;
-    this->y = y;
-    this->z = z;
-}
+vec3::vec3(double x, double y, double z) : x(x), y(y), z(z) {}
 
+// Vector operations
 double vec3::dot(const vec3& other) const {
     return this->x * other.x + this->y * other.y + this->z * other.z;
 }
@@ -20,12 +18,11 @@ double vec3::length_squared() const {
 
 vec3 vec3::normalize() const {
     double length = std::sqrt(this->length_squared());
-    if (length == 0.0) { 
-        return vec3(0.0, 0.0, 0.0); 
-    }
+    if (length == 0.0) return vec3(0.0, 0.0, 0.0);
     return vec3(this->x / length, this->y / length, this->z / length);
 }
 
+// Arithmetic operators
 vec3 vec3::operator+(const vec3& other) const {
     return vec3(this->x + other.x, this->y + other.y, this->z + other.z);
 }
@@ -42,28 +39,28 @@ vec3 vec3::operator*(double mul) const {
     return vec3(this->x * mul, this->y * mul, this->z * mul);
 }
 
+vec3 vec3::operator*(vec3 mul) const {
+    return vec3(this->x * mul.x, this->y * mul.y, this->z * mul.z);
+}
 
+// Random vector utilities
 vec3 random_in_unit_sphere() {
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_real_distribution<double> distribution(-1.0, 1.0);
+    static std::random_device rd;
+    static std::mt19937 generator(rd());
+    static std::uniform_real_distribution<double> distribution(-1.0, 1.0);
 
     while (true) {
-        vec3 p = vec3(distribution(generator) * 2 - 1, 
-                      distribution(generator) * 2 - 1, 
-                      distribution(generator) * 2 - 1);
-        if (p.length_squared() < 1)
+        vec3 p = vec3(distribution(generator), distribution(generator), distribution(generator));
+        if (p.length_squared() < 1.0)
             return p;
     }
 }
+
 vec3 random_unit_vector() {
     return random_in_unit_sphere().normalize();
 }
 
+// Reflection
 vec3 reflect(const vec3& v_in, const vec3& normal) {
     return v_in - (normal * (2.0 * v_in.dot(normal)));
-}
-
-vec3 vec3::operator*(vec3 mul) const {
-    return vec3(this->x * mul.x, this->y * mul.y, this->z * mul.z);
 }

@@ -2,13 +2,13 @@
 #include "vec3.hpp"
 #include <memory>
 
-static const double epsilon = 0.0001;
+class material;
 
-class material;  // Forward declaration
-
+// Abstract base class for ray-intersectable objects
 class hittable {
 public:
     std::shared_ptr<material> mat;
+    static constexpr double epsilon = 0.001;
 
     virtual ~hittable() = default;
 
