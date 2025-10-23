@@ -53,7 +53,8 @@ PREVIEW_SRC = src/preview/window.cpp \
               src/preview/shader_manager.cpp \
               src/preview/renderer.cpp \
               src/preview/camera_gl.cpp \
-              src/preview/sphere.cpp
+              src/preview/sphere.cpp \
+              src/preview/plane.cpp
 
 # Editor (scene, scene_object, editor_ui, camera_controller)
 EDITOR_SRC = src/editor/scene_object.cpp \

@@ -24,10 +24,14 @@
 #include "preview/renderer.hpp"
 #include "preview/camera_gl.hpp"
 #include "preview/sphere.hpp"
+#include "preview/plane.hpp"
 #include "editor/scene.hpp"
 #include "editor/editor_ui.hpp"
 #include "editor/camera_controller.hpp"
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 // ============================================================================
@@ -43,11 +47,7 @@ int main() {
     // ====================================================================
     // 1. CRÉER LA FENÊTRE OPENGL
     // ====================================================================
-    Window window("Éditeur de Scène", 1600, 900);
-    if (!window.is_initialized()) {
-        std::cerr << "Erreur lors de la création de la fenêtre\n";
-        return -1;
-    }
+    Window window(1600, 900, "Éditeur de Scène");
     
     // ====================================================================
     // 2. CHARGER LES SHADERS
@@ -59,9 +59,10 @@ int main() {
     }
     
     // ====================================================================
-    // 3. CRÉER LA GÉOMÉTRIE (sphère)
+    // 3. CRÉER LA GÉOMÉTRIE (sphère + plan)
     // ====================================================================
     Sphere sphere_mesh;
+    Plane plane_mesh(10.0f);  // Plan de 10x10 unités
     
     // ====================================================================
     // 4. CRÉER LA CAMÉRA ET SON CONTRÔLEUR
@@ -83,31 +84,63 @@ int main() {
     scene.create_default_scene();  // 3 sphères de test
     
     EditorUI ui(scene);
-    ui.init(window.get_window());
     
     // ====================================================================
     // 6. ENVOYER LES MATRICES À LA CAMÉRA (une seule fois)
     // ====================================================================
     shader.use();
-    shader.set_uniform_matrix4fv("projection", camera.get_projection_matrix());
+    shader.set_uniform_matrix4fv("projection", glm::value_ptr(camera.get_projection_matrix()));
     
     // ====================================================================
-    // 7. CALLBACKS POUR LE CONTRÔLEUR
+    // 7. INITIALISER IMGUI (APRÈS avoir configuré les matrices)
     // ====================================================================
-    // On va utiliser des lambdas pour connecter GLFW aux callbacks
-    glfwSetWindowUserPointer(window.get_window(), &controller);
+    // IMPORTANT : On initialise ImGui AVANT les callbacks
+    // pour que ImGui installe SES callbacks en premier
+    ui.init(window.get_glfw_window());
     
-    glfwSetMouseButtonCallback(window.get_window(), [](GLFWwindow* w, int button, int action, int mods) {
+    // ====================================================================
+    // 8. CALLBACKS POUR LE CONTRÔLEUR
+    // ====================================================================
+    // IMPORTANT : ImGui a déjà installé ses callbacks.
+    // On vérifie WantCaptureMouse pour savoir si on doit passer l'événement au contrôleur
+    
+    glfwSetWindowUserPointer(window.get_glfw_window(), &controller);
+    
+    // Callback souris : seulement si ImGui ne veut pas l'événement
+    glfwSetMouseButtonCallback(window.get_glfw_window(), [](GLFWwindow* w, int button, int action, int /*mods*/) {
+        // IMPORTANT : Laisser ImGui traiter AVANT
+        ImGui_ImplGlfw_MouseButtonCallback(w, button, action, 0);
+        
+        // ImGui veut l'événement ? (souris sur le menu)
+        if (ImGui::GetIO().WantCaptureMouse) {
+            return;  // Ne rien faire de plus, ImGui a géré
+        }
+        
+        // Sinon, passer au contrôleur
         auto* ctrl = static_cast<CameraController*>(glfwGetWindowUserPointer(w));
         ctrl->on_mouse_button(button, action);
     });
     
-    glfwSetCursorPosCallback(window.get_window(), [](GLFWwindow* w, double x, double y) {
+    // Callback mouvement : seulement si ImGui ne veut pas
+    glfwSetCursorPosCallback(window.get_glfw_window(), [](GLFWwindow* w, double x, double y) {
+        ImGui_ImplGlfw_CursorPosCallback(w, x, y);
+        
+        if (ImGui::GetIO().WantCaptureMouse) {
+            return;
+        }
+        
         auto* ctrl = static_cast<CameraController*>(glfwGetWindowUserPointer(w));
         ctrl->on_mouse_move(x, y);
     });
     
-    glfwSetScrollCallback(window.get_window(), [](GLFWwindow* w, double xoffset, double yoffset) {
+    // Callback molette : seulement si ImGui ne veut pas
+    glfwSetScrollCallback(window.get_glfw_window(), [](GLFWwindow* w, double xoffset, double yoffset) {
+        ImGui_ImplGlfw_ScrollCallback(w, xoffset, yoffset);
+        
+        if (ImGui::GetIO().WantCaptureMouse) {
+            return;
+        }
+        
         auto* ctrl = static_cast<CameraController*>(glfwGetWindowUserPointer(w));
         ctrl->on_scroll(yoffset);
     });
@@ -141,7 +174,7 @@ int main() {
         // ================================================================
         // 9.2 METTRE À JOUR LE CONTRÔLEUR CAMÉRA
         // ================================================================
-        controller.update(window.get_window(), delta_time);
+        controller.update(window.get_glfw_window(), delta_time);
         
         // ================================================================
         // 9.3 EFFACER L'ÉCRAN (fond gris)
@@ -154,12 +187,12 @@ int main() {
         // 9.4 ENVOYER LA MATRICE VIEW AU SHADER (change chaque frame)
         // ================================================================
         shader.use();
-        shader.set_uniform_matrix4fv("view", camera.get_view_matrix());
+        shader.set_uniform_matrix4fv("view", glm::value_ptr(camera.get_view_matrix()));
         
         // ================================================================
         // 9.5 DESSINER TOUS LES OBJETS DE LA SCÈNE
         // ================================================================
-        scene.render_all(shader, sphere_mesh);
+        scene.render_all(shader, sphere_mesh, plane_mesh);
         
         // ================================================================
         // 9.6 DESSINER L'INTERFACE IMGUI

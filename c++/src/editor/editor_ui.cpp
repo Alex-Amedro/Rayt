@@ -1,7 +1,3 @@
-// ============================================================================
-// IMPLÉMENTATION DE EDITORUI
-// ============================================================================
-
 #include "editor/editor_ui.hpp"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -28,12 +24,14 @@ void EditorUI::init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    (void)io;  // Éviter le warning "unused variable"
     
     // 2. Style sombre
     ImGui::StyleColorsDark();
     
     // 3. Initialiser les backends GLFW + OpenGL3
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    // IMPORTANT : install_callbacks = false car on gère manuellement les callbacks
+    ImGui_ImplGlfw_InitForOpenGL(window, false);
     ImGui_ImplOpenGL3_Init("#version 460");
     
     std::cout << "ImGui initialisé\n";
@@ -130,6 +128,17 @@ void EditorUI::render_add_menu() {
         // if (ImGui::Button("Ajouter un Plan", ImVec2(-1, 0))) {
         //     // ... TON CODE ICI ...
         // }
+        if (ImGui::Button("Ajouter une Plan", ImVec2(-1, 0))) {
+
+            SceneObject* plane = new SceneObject(ObjectType::PLANE, "PLANE");
+            plane->position = glm::vec3(0.0f, -1.0f, -5.0f);
+            plane->color = glm::vec3(0.5f, 0.5f, 0.5f);  // Gris
+            plane->size = 10.0f;  // Un grand plan
+
+            scene.add_object(plane);
+            
+            scene.select_object(scene.get_object_count() - 1);
+        }
     }
 }
 
@@ -187,13 +196,8 @@ void EditorUI::render_properties() {
         // ====================================================================
         ImGui::Text("Position");
         ImGui::SliderFloat("X", &obj->position.x, -10.0f, 10.0f);
-        
-        // ====================================================================
-        // TODO : EXERCICE POUR TOI !
-        // ====================================================================
-        // Ajouter les sliders pour Y et Z en suivant le même modèle :
-        // ImGui::SliderFloat("Y", &obj->position.y, -10.0f, 10.0f);
-        // ImGui::SliderFloat("Z", &obj->position.z, -10.0f, 10.0f);
+        ImGui::SliderFloat("Y", &obj->position.y, -10.0f, 10.0f);
+        ImGui::SliderFloat("Z", &obj->position.z, -10.0f, 10.0f);
         
         ImGui::Spacing();
         
@@ -244,6 +248,16 @@ void EditorUI::render_properties() {
 
 void EditorUI::render_actions() {
     if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen)) {
+        
+        // ====================================================================
+        // WIREFRAME (afficher les contours)
+        // ====================================================================
+        bool wireframe = scene.is_wireframe_enabled();
+        if (ImGui::Checkbox("Afficher les contours (wireframe)", &wireframe)) {
+            scene.set_wireframe(wireframe);
+        }
+        
+        ImGui::Spacing();
         
         // Bouton Supprimer (seulement si objet sélectionné)
         if (scene.get_selected() != nullptr) {

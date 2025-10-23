@@ -42,6 +42,7 @@
 // Forward declarations (on inclura les headers dans le .cpp)
 class ShaderManager;
 class Sphere;
+class Plane;
 
 // ============================================================================
 // CLASSE SCENE
@@ -51,6 +52,7 @@ class Scene {
 private:
     std::vector<SceneObject*> objects;  // Liste de tous les objets
     int selected_index;                 // Index de l'objet sélectionné (-1 si aucun)
+    bool wireframe_enabled;             // Afficher le wireframe ?
     
 public:
     // ====================================================================
@@ -98,13 +100,20 @@ public:
     int get_selected_index() const { return selected_index; }
     
     // ====================================================================
+    // WIREFRAME
+    // ====================================================================
+    void set_wireframe(bool enabled) { wireframe_enabled = enabled; }
+    bool is_wireframe_enabled() const { return wireframe_enabled; }
+    
+    // ====================================================================
     // RENDU (OpenGL)
     // ====================================================================
     
     // Dessiner tous les objets
     // shader : le shader OpenGL à utiliser
     // sphere_mesh : la géométrie de la sphère (pour dessiner les sphères)
-    void render_all(ShaderManager& shader, Sphere& sphere_mesh);
+    // plane_mesh : la géométrie du plan (pour dessiner les plans)
+    void render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_mesh);
     
     // ====================================================================
     // UTILITAIRES

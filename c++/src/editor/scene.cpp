@@ -5,6 +5,7 @@
 #include "editor/scene.hpp"
 #include "preview/shader_manager.hpp"
 #include "preview/sphere.hpp"
+#include "preview/plane.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
@@ -14,6 +15,7 @@
 
 Scene::Scene()
     : selected_index(-1)  // Aucun objet sélectionné
+    , wireframe_enabled(true)  // Wireframe activé par défaut
 {
 }
 
@@ -126,27 +128,49 @@ SceneObject* Scene::get_selected() {
 // RENDU DE TOUS LES OBJETS
 // ============================================================================
 
-void Scene::render_all(ShaderManager& shader, Sphere& sphere_mesh) {
+void Scene::render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_mesh) {
     shader.use();
     
     for (SceneObject* obj : objects) {
+        // 1. Envoyer la matrice model (position + échelle)
+        glm::mat4 model = obj->get_model_matrix();
+        shader.set_uniform_matrix4fv("model", glm::value_ptr(model));
+        
+        // ================================================================
+        // PASS 1 : Dessiner l'objet REMPLI (avec sa couleur)
+        // ================================================================
+        shader.set_uniform_3f("objectColor", obj->color.r, obj->color.g, obj->color.b);
+        
+        // Mode rempli (par défaut)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        
         if (obj->type == ObjectType::SPHERE) {
-            // 1. Envoyer la matrice model (position + échelle)
-            glm::mat4 model = obj->get_model_matrix();
-            shader.set_uniform_matrix4fv("model", glm::value_ptr(model));
-            
-            // 2. Envoyer la couleur
-            shader.set_uniform_3f("objectColor", obj->color.r, obj->color.g, obj->color.b);
-            
-            // 3. Dessiner la sphère
             sphere_mesh.draw();
         }
+        else if (obj->type == ObjectType::PLANE) {
+            plane_mesh.draw();
+        }
         
-        // TODO : EXERCICE POUR TOI !
-        // Ajouter le rendu des PLANS ici
-        // if (obj->type == ObjectType::PLANE) {
-        //     // ...
-        // }
+        // ================================================================
+        // PASS 2 : Dessiner les CONTOURS (wireframe en noir)
+        // ================================================================
+        if (wireframe_enabled) {
+            shader.set_uniform_3f("objectColor", 0.0f, 0.0f, 0.0f);  // Noir
+            
+            // Mode wireframe (lignes seulement)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glLineWidth(1.5f);  // Épaisseur des lignes
+            
+            if (obj->type == ObjectType::SPHERE) {
+                sphere_mesh.draw();
+            }
+            else if (obj->type == ObjectType::PLANE) {
+                plane_mesh.draw();
+            }
+            
+            // Remettre en mode rempli pour le prochain objet
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
     }
 }
 
