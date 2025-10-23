@@ -155,7 +155,11 @@ void Scene::render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_
         // PASS 2 : Dessiner les CONTOURS (wireframe en noir)
         // ================================================================
         if (wireframe_enabled) {
-            shader.set_uniform_3f("objectColor", 0.0f, 0.0f, 0.0f);  // Noir
+            if (!obj->selected) {   
+                shader.set_uniform_3f("objectColor", 0.0f, 0.0f, 0.0f);  // Noir
+            } else {
+                shader.set_uniform_3f("objectColor", 1.0f - obj->color.r, 1.0f - obj->color.g, 1.0f - obj->color.b);  // Blanc
+            }
             
             // Mode wireframe (lignes seulement)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

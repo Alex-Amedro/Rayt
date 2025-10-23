@@ -33,21 +33,6 @@ Plane::~Plane() {
 // GENERATE_PLANE : Créer la géométrie
 // ============================================================================
 void Plane::generate_plane() {
-    // ========================================================================
-    // ÉTAPE 1 : Créer les 4 coins du rectangle
-    // ========================================================================
-    //
-    // Le plan est dans le plan XZ (horizontal), centré à l'origine
-    //
-    //       -X          +X
-    //        │          │
-    //   p0 ─┼──────────┼─ p1     ← +Z (avant)
-    //        │          │
-    //        │  CENTRE  │
-    //        │    (0,0) │
-    //   p2 ─┼──────────┼─ p3     ← -Z (arrière)
-    //        │          │
-    //
     
     float half = size / 2.0f;  // Demi-taille
     
@@ -75,19 +60,12 @@ void Plane::generate_plane() {
     p3.color = glm::vec3(0.5f, 0.5f, 0.5f);
     p3.normal = glm::vec3(0.0f, 1.0f, 0.0f);
     
-    // Ajouter les vertices
+
     vertices.push_back(p0);
     vertices.push_back(p1);
     vertices.push_back(p2);
     vertices.push_back(p3);
     
-    // ========================================================================
-    // ÉTAPE 2 : Créer les indices (2 triangles)
-    // ========================================================================
-    //
-    // Triangle 1 : p0 → p2 → p1 (sens anti-horaire vu de dessus)
-    // Triangle 2 : p1 → p2 → p3
-    //
     
     // Premier triangle
     indices.push_back(0);  // p0
