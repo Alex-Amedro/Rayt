@@ -1,0 +1,63 @@
+# ============================================================================
+# MAKEFILE - LEÇON 1 : Compiler le preview OpenGL
+# ============================================================================
+#
+# Utilisation :
+#   make -f Makefile.preview     = compiler et exécuter le preview
+#   make -f Makefile.preview run = exécuter
+#   make -f Makefile.preview clean = nettoyer
+#
+# ============================================================================
+
+# Compilateur
+CXX = g++
+
+# Flags C++
+CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O3
+
+# Chemins include
+INCLUDE = -I./include
+
+# Flags GLFW/GLEW/GLM
+GLFW_FLAGS = $(shell pkg-config --cflags glfw3)
+GLEW_FLAGS = $(shell pkg-config --cflags glew)
+CXXFLAGS += $(GLFW_FLAGS) $(GLEW_FLAGS)
+
+# Libs GLFW/GLEW
+GLFW_LIBS = $(shell pkg-config --libs glfw3)
+GLEW_LIBS = $(shell pkg-config --libs glew)
+LIBS = $(GLFW_LIBS) $(GLEW_LIBS) -lGL
+
+# Fichiers source pour le preview
+PREVIEW_SRC = src/preview/window.cpp src/preview/shader_manager.cpp src/preview/renderer.cpp src/preview/camera_gl.cpp src/preview/sphere.cpp src/preview/main.cpp src/core/vec3.cpp
+PREVIEW_OBJ = $(PREVIEW_SRC:.cpp=.o)
+PREVIEW_EXE = preview
+
+# ============================================================================
+# RÈGLES
+# ============================================================================
+
+# Règle par défaut : compiler
+all: $(PREVIEW_EXE)
+
+# Compiler et exécuter le preview
+run: $(PREVIEW_EXE)
+	./$(PREVIEW_EXE)
+
+# Compiler l'exécutable
+$(PREVIEW_EXE): $(PREVIEW_OBJ)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)
+	@echo ""
+	@echo "✓ Compilation réussie !"
+	@echo ""
+
+# Compiler les fichiers .cpp en .o
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c -o $@ $<
+
+# Nettoyer les fichiers objets
+clean:
+	rm -f $(PREVIEW_OBJ) $(PREVIEW_EXE)
+	@echo "✓ Nettoyage effectué"
+
+.PHONY: all run clean

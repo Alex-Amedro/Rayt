@@ -15,28 +15,101 @@
 #include "materials/material.hpp"
 #include "materials/diffuse.hpp"
 #include "materials/metal.hpp"
+#include "materials/dielectric.hpp"
+
+// Global random number generator for all materials
+std::random_device rd;
+std::mt19937 generator(rd());
+std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+// ==================== USER INPUT INTERFACE ====================
+
+void display_menu() {
+    std::cout << "\n";
+    std::cout << "╔══════════════════════════════════════╗\n";
+    std::cout << "║       Ray Tracer Configuration       ║\n";
+    std::cout << "╚══════════════════════════════════════╝\n\n";
+}
+
+int get_positive_input(const std::string& prompt, int default_value) {
+    std::string input;
+    std::cout << prompt << " [default: " << default_value << "]: ";
+    std::getline(std::cin, input);
+    
+    if (input.empty()) {
+        return default_value;
+    }
+    
+    try {
+        int value = std::stoi(input);
+        if (value > 0) {
+            return value;
+        } else {
+            std::cout << "  ⚠ Value must be positive, using default: " << default_value << "\n";
+            return default_value;
+        }
+    } catch (...) {
+        std::cout << "  ⚠ Invalid input, using default: " << default_value << "\n";
+        return default_value;
+    }
+}
+
+void show_progress_bar(int current, int total) {
+    double percent = static_cast<double>(current) / total * 100.0;
+    int blocks = static_cast<int>(percent / 2.0);
+    
+    std::string bar(blocks, '#');
+    std::string empty(50 - blocks, '-');
+    
+    std::cout << "\r[" << bar << empty << "] " 
+              << static_cast<int>(percent) << "% (" 
+              << current << "/" << total << ")" << std::flush;
+}
+
+// ==================== END USER INTERFACE ====================
 
 int main() {
 
-    // Image configuration
-    const int image_width = 800;   
-    const int image_height = 400;  
+    // Display menu
+    display_menu();
+    
+    // Get user input
+    int image_width = get_positive_input("Image width (pixels)", 800);
+    int image_height = get_positive_input("Image height (pixels)", 400);
+    int samples_per_pixel = get_positive_input("Samples per pixel (quality)", 200);
+    int max_depth = get_positive_input("Max ray depth (bounces)", 50);
+    
+    std::cout << "\n✓ Configuration accepted\n";
+    std::cout << "  Resolution: " << image_width << "x" << image_height << "\n";
+    std::cout << "  Samples: " << samples_per_pixel << " | Max depth: " << max_depth << "\n";
+    std::cout << "\nStarting render...\n\n";
+    
     const double aspect_ratio = static_cast<double>(image_width) / image_height;
-    const int samples_per_pixel = 200;  
-    const int max_depth = 50;
 
     // Materials setup
     auto mat_ground = std::make_shared<diffuse>(vec3(128, 128, 128));     
-    auto mat_center = std::make_shared<metal>(vec3(255, 255, 255), 0.0);  
+    auto mat_glass = std::make_shared<dielectric>(1.5, vec3(255,255,255)); // Glass sphere
     auto mat_left = std::make_shared<diffuse>(vec3(255, 0, 0));            
     auto mat_right = std::make_shared<metal>(vec3(200, 150, 50), 0.1);    
+    
+    // Materials for spheres behind glass
+    auto mat_behind_red = std::make_shared<diffuse>(vec3(255, 50, 50));        // Red diffuse
+    auto mat_behind_metal = std::make_shared<metal>(vec3(180, 180, 255), 0.0); // Shiny blue metal
+    auto mat_behind_rough = std::make_shared<metal>(vec3(100, 200, 100), 0.3); // Rough green metal
 
     // Scene objects
     std::vector<std::shared_ptr<hittable>> scene_objects;
     scene_objects.push_back(std::make_shared<plane>(vec3(0, -1, 0), vec3(0, 1, 0), mat_ground)); 
-    scene_objects.push_back(std::make_shared<sphere>(vec3(0, 0, -3), 1.0, mat_center));           
-    scene_objects.push_back(std::make_shared<sphere>(vec3(-2.5, 0, -3), 1.0, mat_left));         
-    scene_objects.push_back(std::make_shared<sphere>(vec3(2.5, 0, -3), 1.0, mat_right));         
+    
+    // Front spheres
+    scene_objects.push_back(std::make_shared<sphere>(vec3(0, 0, -3), 1.0, mat_glass));      // Glass in center
+    scene_objects.push_back(std::make_shared<sphere>(vec3(-2.5, 0, -3), 1.0, mat_left));    // Red left
+    scene_objects.push_back(std::make_shared<sphere>(vec3(2.5, 0, -3), 1.0, mat_right));    // Metal right
+    
+    // Three spheres BEHIND the glass (visible through refraction!)
+    scene_objects.push_back(std::make_shared<sphere>(vec3(-0.6, 0.3, -5.5), 0.5, mat_behind_red));    // Red diffuse
+    scene_objects.push_back(std::make_shared<sphere>(vec3(0, -0.2, -5.5), 0.5, mat_behind_metal));   // Shiny metal
+    scene_objects.push_back(std::make_shared<sphere>(vec3(0.6, 0.3, -5.5), 0.5, mat_behind_rough));   // Rough metal
     
     // Camera setup
     vec3 lookfrom(0, 0, 0);
@@ -45,27 +118,15 @@ int main() {
     double vfov = 90.0;
     Camera camera(lookfrom, lookat, vup, vfov, aspect_ratio);
 
-    // Random number generator for anti-aliasing
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
     // Output file
     std::ofstream file("image.ppm");
     file << "P3\n" << image_width << " " << image_height << "\n255\n";
 
     // Render loop
     for (int y = image_height - 1; y >= 0; --y) {
-
-        // Progress indicator
-        double percent_complete = static_cast<double>(image_height - y) / image_height * 100.0;
-        int progress_blocks = static_cast<int>(percent_complete / 2.0); 
-
-        std::string filled_part(progress_blocks, '#'); // Partie remplie
-        std::string empty_part(50 - progress_blocks, '-'); // Partie vide
-
-        std::cout << "\rProgression: [" << filled_part << empty_part << "] "
-          << static_cast<int>(percent_complete) << "% " << std::flush;
+        
+        // Show progress bar
+        show_progress_bar(image_height - y, image_height);
 
         for (int x = 0; x < image_width; ++x) {
             vec3 total_color(0, 0, 0);
@@ -103,7 +164,7 @@ int main() {
         }
     }
     
-    std::cout << "\nDone.\n";
+    std::cout << "\n\n✓ Render complete! Image saved as 'image.ppm'\n";
     file.close();
     return 0;
 }

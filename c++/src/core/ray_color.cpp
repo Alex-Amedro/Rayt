@@ -5,6 +5,33 @@
 #include <vector>
 #include <memory>
 #include <limits>
+#include <cmath>
+#include <algorithm>
+
+bool refract(const vec3& v_in_normalized, const vec3& n, double ior_ratio, vec3& refracted_direction) {
+
+    double cos_theta = std::min((vec3(0.0, 0.0, 0.0)-v_in_normalized).dot(n), 1.0);
+    
+    vec3 r_out_perp = (v_in_normalized + (n * cos_theta)) * ior_ratio;
+    
+    double r_out_parallel_sq = 1.0 - r_out_perp.length_squared();
+    if (r_out_parallel_sq > 0.0) {
+        
+        vec3 r_out_parallel = n * -std::sqrt(r_out_parallel_sq);
+        refracted_direction = r_out_perp + r_out_parallel;
+        return true; 
+
+    } else {
+        return false;
+    }
+}
+
+
+double reflectance(double cosine, double ref_idx_ratio) {
+    double r0 = (1.0 - ref_idx_ratio) / (1.0 + ref_idx_ratio);
+    r0 = r0 * r0;
+    return r0 + (1.0 - r0) * std::pow((1.0 - cosine), 5);
+}
 
 vec3 ray_color(
     const vec3& ray_origin,
@@ -43,7 +70,13 @@ vec3 ray_color(
             ))
         {
             // Material scattered the ray - trace recursively
-            vec3 next_origin = hit_point + (hit_normal * hittable::epsilon);
+            // For refraction, we need to offset in the opposite direction
+            // Check if scattered ray is going into or out of the surface
+            bool same_hemisphere = scattered_direction.dot(hit_normal) > 0;
+            vec3 offset = same_hemisphere ? (hit_normal * hittable::epsilon) 
+                                          : (hit_normal * -hittable::epsilon);
+            vec3 next_origin = hit_point + offset;
+            
             vec3 color_from_scatter = ray_color(next_origin, scattered_direction, scene, depth - 1);
             
             // Apply material attenuation (albedo in [0, 255] range)

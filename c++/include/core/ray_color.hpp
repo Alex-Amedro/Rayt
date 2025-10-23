@@ -10,3 +10,7 @@ vec3 ray_color(
     const std::vector<std::shared_ptr<hittable>>& scene,
     int depth 
 );
+
+bool refract(const vec3& v_in_normalized, const vec3& n, double ior_ratio, vec3& refracted_direction);
+
+double reflectance(double cosine, double ref_idx_ratio);

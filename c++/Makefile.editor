@@ -1,0 +1,106 @@
+# ============================================================================
+# MAKEFILE - ÉDITEUR DE SCÈNE
+# ============================================================================
+#
+# Utilisation :
+#   make -f Makefile.editor        = compiler l'éditeur
+#   make -f Makefile.editor run    = compiler et exécuter
+#   make -f Makefile.editor clean  = nettoyer
+#
+# ============================================================================
+
+# Compilateur
+CXX = g++
+
+# Flags C++
+CXXFLAGS = -std=c++17 -Wall -Wextra -Wpedantic -O3
+
+# Chemins include
+INCLUDE = -I./include -I./external/imgui -I./external/imgui/backends
+
+# Flags GLFW/GLEW/GLM
+GLFW_FLAGS = $(shell pkg-config --cflags glfw3)
+GLEW_FLAGS = $(shell pkg-config --cflags glew)
+CXXFLAGS += $(GLFW_FLAGS) $(GLEW_FLAGS)
+
+# Libs GLFW/GLEW
+GLFW_LIBS = $(shell pkg-config --libs glfw3)
+GLEW_LIBS = $(shell pkg-config --libs glew)
+LIBS = $(GLFW_LIBS) $(GLEW_LIBS) -lGL
+
+# ============================================================================
+# SOURCES IMGUI
+# ============================================================================
+IMGUI_DIR = external/imgui
+IMGUI_SRC = $(IMGUI_DIR)/imgui.cpp \
+            $(IMGUI_DIR)/imgui_demo.cpp \
+            $(IMGUI_DIR)/imgui_draw.cpp \
+            $(IMGUI_DIR)/imgui_tables.cpp \
+            $(IMGUI_DIR)/imgui_widgets.cpp \
+            $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp \
+            $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
+
+IMGUI_OBJ = $(IMGUI_SRC:.cpp=.o)
+
+# ============================================================================
+# SOURCES DU PROJET
+# ============================================================================
+# Core (vec3, ray_color...)
+CORE_SRC = src/core/vec3.cpp
+
+# Preview (window, shaders, camera, sphere...)
+PREVIEW_SRC = src/preview/window.cpp \
+              src/preview/shader_manager.cpp \
+              src/preview/renderer.cpp \
+              src/preview/camera_gl.cpp \
+              src/preview/sphere.cpp
+
+# Editor (scene, scene_object, editor_ui, camera_controller)
+EDITOR_SRC = src/editor/scene_object.cpp \
+             src/editor/scene.cpp \
+             src/editor/editor_ui.cpp \
+             src/editor/camera_controller.cpp \
+             src/editor/main_editor.cpp
+
+# Tous les .cpp
+ALL_SRC = $(CORE_SRC) $(PREVIEW_SRC) $(EDITOR_SRC) $(IMGUI_SRC)
+
+# Tous les .o
+ALL_OBJ = $(ALL_SRC:.cpp=.o)
+
+# Exécutable final
+EDITOR_EXE = editor
+
+# ============================================================================
+# RÈGLES
+# ============================================================================
+
+# Règle par défaut : compiler
+all: $(EDITOR_EXE)
+
+# Compiler et exécuter
+run: $(EDITOR_EXE)
+	./$(EDITOR_EXE)
+
+# Compiler l'exécutable
+$(EDITOR_EXE): $(ALL_OBJ)
+	@echo ""
+	@echo "Linking $(EDITOR_EXE)..."
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)
+	@echo ""
+	@echo "✓ Éditeur compilé : ./$(EDITOR_EXE)"
+	@echo ""
+
+# Compiler les .cpp en .o
+%.o: %.cpp
+	@echo "Compiling $<..."
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+# Nettoyer
+clean:
+	@echo "Nettoyage..."
+	rm -f $(ALL_OBJ) $(EDITOR_EXE)
+	@echo "Nettoyé !"
+
+# Phony targets
+.PHONY: all run clean
