@@ -145,6 +145,14 @@ int main() {
         ctrl->on_scroll(yoffset);
     });
     
+    // Callback clavier : ImGui gère automatiquement avec install_callbacks=true
+    // Mais on peut ajouter un callback personnalisé si besoin
+    glfwSetKeyCallback(window.get_glfw_window(), [](GLFWwindow* w, int key, int scancode, int action, int mods) {
+        // Laisser ImGui traiter le clavier en premier
+        ImGui_ImplGlfw_KeyCallback(w, key, scancode, action, mods);
+        // ImGui gère maintenant l'input clavier (zones de texte, etc.)
+    });
+    
     // ====================================================================
     // 8. VARIABLES DE TEMPS (pour delta_time)
     // ====================================================================
@@ -164,6 +172,8 @@ int main() {
     // 9. BOUCLE DE RENDU
     // ====================================================================
     while (!window.should_close()) {
+
+
         // ================================================================
         // 9.1 CALCULER LE DELTA TIME
         // ================================================================

@@ -30,8 +30,9 @@ void EditorUI::init(GLFWwindow* window) {
     ImGui::StyleColorsDark();
     
     // 3. Initialiser les backends GLFW + OpenGL3
-    // IMPORTANT : install_callbacks = false car on gère manuellement les callbacks
-    ImGui_ImplGlfw_InitForOpenGL(window, false);
+    // IMPORTANT : install_callbacks = true pour que ImGui gère les callbacks automatiquement
+    // (incluant le clavier pour les zones de texte)
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
     
     std::cout << "ImGui initialisé\n";
@@ -114,20 +115,7 @@ void EditorUI::render_add_menu() {
             scene.select_object(scene.get_object_count() - 1);
         }
         
-        // ====================================================================
-        // TODO : EXERCICE POUR TOI !
-        // ====================================================================
-        // Ajouter un bouton "Ajouter un Plan" en suivant le même modèle
-        // Copie le code ci-dessus et adapte-le pour :
-        // - ObjectType::PLANE
-        // - Nom : "Plan"
-        // - Position : glm::vec3(0, -1, 0)  // Un plan horizontal sous les objets
-        // - Couleur : glm::vec3(0.5f, 0.5f, 0.5f)  // Gris
-        // - Size : 10.0f  // Un grand plan
-        //
-        // if (ImGui::Button("Ajouter un Plan", ImVec2(-1, 0))) {
-        //     // ... TON CODE ICI ...
-        // }
+        
         if (ImGui::Button("Ajouter une Plan", ImVec2(-1, 0))) {
 
             SceneObject* plane = new SceneObject(ObjectType::PLANE, "PLANE");
@@ -186,7 +174,11 @@ void EditorUI::render_properties() {
         // ====================================================================
         // NOM DE L'OBJET
         // ====================================================================
-        ImGui::Text("Objet : %s", obj->name.c_str());
+        static char buffer[128] = "";
+        strncpy(buffer, obj->name.c_str(), sizeof(buffer));
+        if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
+            obj->name = buffer;
+        }
         ImGui::Text("Type : %s", obj->get_type_name().c_str());
         
         ImGui::Spacing();

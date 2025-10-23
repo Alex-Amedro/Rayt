@@ -4,6 +4,7 @@
 
 #include "editor/camera_controller.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui.h>
 #include <iostream>
 
 // Constantes
@@ -32,6 +33,15 @@ CameraController::CameraController(CameraGL& cam)
 // ============================================================================
 
 void CameraController::update(GLFWwindow* window, float delta_time) {
+    // ====================================================================
+    // 0. VÉRIFIER SI IMGUI VEUT LE CLAVIER
+    // ====================================================================
+    // Si ImGui veut traiter le clavier (zone de texte active, etc.), 
+    // ne pas traiter les entrées clavier pour la caméra
+    if (ImGui::GetIO().WantCaptureKeyboard) {
+        return;
+    }
+    
     // ====================================================================
     // 1. CLAVIER : ZQSD (ou WASD)
     // ====================================================================
