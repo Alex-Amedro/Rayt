@@ -44,7 +44,7 @@ int main() {
     // ====================================================================
     Sphere sphere_mesh;
     Plane plane_mesh(10.0f);  // Plan de 10x10 unités
-    Grid grid(10.0f, 10);     // Grille de 10x10 unités, 10 divisions
+    Grid grid(100.0f, 100);     // Grille de 10x10 unités, 10 divisions
     
     // ====================================================================
     // 4. CRÉER LA CAMÉRA ET SON CONTRÔLEUR

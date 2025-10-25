@@ -206,11 +206,6 @@ void Scene::clear() {
 
 void Scene::create_default_scene() {
     clear();
-    //  Grid 
-    SceneObject* grid = new SceneObject(ObjectType::PLANE, "Grille");
-    grid->position = glm::vec3(0.0f, 0.0f, 0.0f);
-    grid->color = glm::vec3(0.0f, 0.0f, 0.0f);  // Gris
-    add_object(grid);
 
     // Sphère rouge
     SceneObject* sphere1 = new SceneObject(ObjectType::SPHERE, "Sphère Rouge");
