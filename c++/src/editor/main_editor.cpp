@@ -54,8 +54,13 @@ int main() {
         glm::vec3(0, 0, 0),     // Target (centre de la scène)
         glm::vec3(0, 1, 0),     // Up
         45.0f,                  // FOV
-        16.0f / 9.0f            // Aspect ratio
+        16.0f / 9.0f            // Aspect ratio (sera mis à jour après)
     );
+    
+    // Mettre à jour l'aspect ratio avec la taille réelle de la fenêtre
+    int window_width, window_height;
+    glfwGetWindowSize(window.get_glfw_window(), &window_width, &window_height);
+    camera.set_aspect_ratio((float)window_width / (float)window_height);
     
     CameraController controller(camera);
     
@@ -86,7 +91,17 @@ int main() {
     // IMPORTANT : ImGui a déjà installé ses callbacks.
     // On vérifie WantCaptureMouse pour savoir si on doit passer l'événement au contrôleur
     
-    glfwSetWindowUserPointer(window.get_glfw_window(), &controller);
+    // Struct pour passer multiple données au callback
+    struct CallbackData {
+        CameraController* controller;
+        Scene* scene;
+        CameraGL* camera;
+        int window_width;
+        int window_height;
+    };
+    
+    CallbackData cb_data = {&controller, &scene, &camera, 1600, 900};
+    glfwSetWindowUserPointer(window.get_glfw_window(), &cb_data);
     
     // Callback souris : seulement si ImGui ne veut pas l'événement
     glfwSetMouseButtonCallback(window.get_glfw_window(), [](GLFWwindow* w, int button, int action, int /*mods*/) {
@@ -98,11 +113,54 @@ int main() {
             return;  // Ne rien faire de plus, ImGui a géré
         }
         
-        // Sinon, passer au contrôleur
-        auto* ctrl = static_cast<CameraController*>(glfwGetWindowUserPointer(w));
-        ctrl->on_mouse_button(button, action);
+        auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
+        
+        // CLIC GAUCHE = sélectionner un objet
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            double mouse_x, mouse_y;
+            glfwGetCursorPos(w, &mouse_x, &mouse_y);
+            
+            // Récupérer la taille du viewport OpenGL (pas la fenêtre complète !)
+            // Le viewport exclut l'interface ImGui qui prend 20% à droite
+            GLint viewport[4];
+            glGetIntegerv(GL_VIEWPORT, viewport);
+            int viewport_width = viewport[2];
+            int viewport_height = viewport[3];
+            
+            std::cout << "\n[CLICK LEFT] Position souris : (" << mouse_x << ", " << mouse_y << ")\n";
+            std::cout << "[CLICK LEFT] Viewport OpenGL : " << viewport_width << "x" << viewport_height << "\n";
+            
+            // Créer le rayon en utilisant la taille du viewport 3D
+            float ndc_x = (2.0f * (float)mouse_x) / viewport_width - 1.0f;
+            float ndc_y = 1.0f - (2.0f * (float)mouse_y) / viewport_height;  // Y inversé pour OpenGL
+            
+            std::cout << "[CLICK LEFT] NDC : (" << ndc_x << ", " << ndc_y << ")\n";
+            
+            glm::vec4 ray_clip(ndc_x, ndc_y, -1.0f, 1.0f);
+            glm::vec4 ray_eye = glm::inverse(data->camera->get_projection_matrix()) * ray_clip;
+            ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+            
+            glm::vec3 ray_dir = glm::normalize(
+                glm::vec3(glm::inverse(data->camera->get_view_matrix()) * ray_eye)
+            );
+            glm::vec3 ray_origin = data->camera->get_position();
+            
+            // Détecter l'objet
+            int index = data->scene->pick_object(ray_origin, ray_dir);
+            
+            if (index >= 0) {
+                data->scene->select_object(index);
+                std::cout << "[CLICK LEFT] Objet sélectionné : " << index << "\n";
+            } else {
+                std::cout << "[CLICK LEFT] Aucun objet détecté\n";
+            }
+        }
+        // CLIC DROIT = rotation caméra
+        else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            data->controller->on_mouse_button(button, action);
+        }
     });
-    
+
     // Callback mouvement : seulement si ImGui ne veut pas
     glfwSetCursorPosCallback(window.get_glfw_window(), [](GLFWwindow* w, double x, double y) {
         ImGui_ImplGlfw_CursorPosCallback(w, x, y);
@@ -111,8 +169,8 @@ int main() {
             return;
         }
         
-        auto* ctrl = static_cast<CameraController*>(glfwGetWindowUserPointer(w));
-        ctrl->on_mouse_move(x, y);
+        auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
+        data->controller->on_mouse_move(x, y);
     });
     
     // Callback molette : seulement si ImGui ne veut pas
@@ -123,16 +181,25 @@ int main() {
             return;
         }
         
-        auto* ctrl = static_cast<CameraController*>(glfwGetWindowUserPointer(w));
-        ctrl->on_scroll(yoffset);
+        auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
+        data->controller->on_scroll(yoffset);
     });
     
     // Callback clavier : ImGui gère automatiquement avec install_callbacks=true
-    // Mais on peut ajouter un callback personnalisé si besoin
     glfwSetKeyCallback(window.get_glfw_window(), [](GLFWwindow* w, int key, int scancode, int action, int mods) {
-        // Laisser ImGui traiter le clavier en premier
         ImGui_ImplGlfw_KeyCallback(w, key, scancode, action, mods);
-        // ImGui gère maintenant l'input clavier (zones de texte, etc.)
+    });
+    
+    // Callback de redimensionnement : mettre à jour l'aspect ratio de la caméra
+    glfwSetFramebufferSizeCallback(window.get_glfw_window(), [](GLFWwindow* w, int width, int height) {
+        glViewport(0, 0, width, height);  // Mettre à jour le viewport OpenGL
+        
+        auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
+        if (data && data->camera && width > 0 && height > 0) {
+            data->camera->set_aspect_ratio((float)width / (float)height);
+            std::cout << "[RESIZE] Fenêtre redimensionnée : " << width << "x" << height 
+                      << " (aspect ratio = " << ((float)width / (float)height) << ")\n";
+        }
     });
     
     // ====================================================================
@@ -176,10 +243,11 @@ int main() {
         glEnable(GL_DEPTH_TEST);
         
         // ================================================================
-        // 9.4 ENVOYER LA MATRICE VIEW AU SHADER (change chaque frame)
+        // 9.4 ENVOYER LES MATRICES VIEW ET PROJECTION AU SHADER
         // ================================================================
         shader.use();
         shader.set_uniform_matrix4fv("view", glm::value_ptr(camera.get_view_matrix()));
+        shader.set_uniform_matrix4fv("projection", glm::value_ptr(camera.get_projection_matrix()));
         
         // ================================================================
         // 9.5 DESSINER TOUS LES OBJETS DE LA SCÈNE

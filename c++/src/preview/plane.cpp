@@ -127,3 +127,21 @@ void Plane::draw() {
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
+
+bool ray_plane_intersection(
+    glm::vec3 ray_origin,
+    glm::vec3 ray_dir,
+    glm::vec3 plane_center,
+    glm::vec3 plane_normal,
+    float plane_size,
+    float& t_hit
+) {
+    float denom = glm::dot(ray_dir, plane_normal);
+    if (abs(denom) < 1e-6) return false;  
+    t_hit = glm::dot(plane_center - ray_origin, plane_normal) / denom;
+    if (t_hit < 0) return false;  
+    glm::vec3 hit_point = ray_origin + ray_dir * t_hit;
+    glm::vec3 local = hit_point - plane_center;
+    
+    return abs(local.x) <= plane_size/2 && abs(local.z) <= plane_size/2;
+}

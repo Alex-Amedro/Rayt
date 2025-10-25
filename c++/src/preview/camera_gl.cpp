@@ -85,3 +85,8 @@ void CameraGL::set_fov(float new_fov) {
     fov = new_fov;
     update_matrices();
 }
+
+void CameraGL::set_aspect_ratio(float new_aspect) {
+    aspect_ratio = new_aspect;
+    update_matrices();
+}

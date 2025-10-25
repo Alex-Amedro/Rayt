@@ -73,6 +73,7 @@ public:
     void set_target(glm::vec3 new_target);
     void set_up(glm::vec3 new_up);
     void set_fov(float new_fov);
+    void set_aspect_ratio(float new_aspect);  // Nouveau : mettre à jour l'aspect ratio
     
     // ====================================================================
     // GETTERS : Récupérer les matrices

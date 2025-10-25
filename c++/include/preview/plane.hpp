@@ -27,4 +27,20 @@ public:
     ~Plane();
 
     void draw();
+    
+    float get_size() const { return size; }
 };
+
+// ============================================================================
+// FONCTION D'INTERSECTION RAYON/PLAN (pour ray picking)
+// ============================================================================
+bool ray_plane_intersection(
+    glm::vec3 ray_origin,
+    glm::vec3 ray_dir,
+    glm::vec3 plane_center,
+    glm::vec3 plane_normal,
+    float plane_size,
+    float& t_hit
+);
+
+

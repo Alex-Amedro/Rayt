@@ -131,4 +131,7 @@ public:
     
     // Créer une scène par défaut (pour tester)
     void create_default_scene();
+
+    // Récupérer l'index de l'objet intersecté par un rayon
+    int pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction);
 };

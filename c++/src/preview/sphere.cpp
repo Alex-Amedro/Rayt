@@ -159,3 +159,22 @@ void Sphere::draw() {
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
+
+bool ray_sphere_intersection(
+    glm::vec3 ray_origin, 
+    glm::vec3 ray_dir,
+    glm::vec3 sphere_center, 
+    float sphere_radius,
+    float& t_hit
+) {
+    glm::vec3 oc = ray_origin - sphere_center;
+    float a = glm::dot(ray_dir, ray_dir);
+    float b = 2.0f * glm::dot(oc, ray_dir);
+    float c = glm::dot(oc, oc) - sphere_radius * sphere_radius;
+    
+    float discriminant = b * b - 4 * a * c;
+    if (discriminant < 0) return false;  
+    
+    t_hit = (-b - sqrt(discriminant)) / (2 * a);
+    return t_hit > 0;  
+}
