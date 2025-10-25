@@ -43,7 +43,7 @@
 class ShaderManager;
 class Sphere;
 class Plane;
-
+class Grid;
 // ============================================================================
 // CLASSE SCENE
 // ============================================================================
@@ -53,6 +53,7 @@ private:
     std::vector<SceneObject*> objects;  // Liste de tous les objets
     int selected_index;                 // Index de l'objet sélectionné (-1 si aucun)
     bool wireframe_enabled;             // Afficher le wireframe ?
+    bool grid_enabled;                  // Afficher la grille ?
     
 public:
     // ====================================================================
@@ -106,6 +107,12 @@ public:
     bool is_wireframe_enabled() const { return wireframe_enabled; }
     
     // ====================================================================
+    // GRILLE
+    // ====================================================================
+    void set_grid(bool enabled) { grid_enabled = enabled; }
+    bool is_grid_enabled() const { return grid_enabled; }
+    
+    // ====================================================================
     // RENDU (OpenGL)
     // ====================================================================
     
@@ -113,7 +120,7 @@ public:
     // shader : le shader OpenGL à utiliser
     // sphere_mesh : la géométrie de la sphère (pour dessiner les sphères)
     // plane_mesh : la géométrie du plan (pour dessiner les plans)
-    void render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_mesh);
+    void render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_mesh, Grid& grid_mesh);
     
     // ====================================================================
     // UTILITAIRES

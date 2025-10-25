@@ -251,6 +251,16 @@ void EditorUI::render_actions() {
         
         ImGui::Spacing();
         
+        // ====================================================================
+        // GRILLE (afficher la grille au sol)
+        // ====================================================================
+        bool grid = scene.is_grid_enabled();
+        if (ImGui::Checkbox("Afficher la grille au sol", &grid)) {
+            scene.set_grid(grid);
+        }
+        
+        ImGui::Spacing();
+        
         // Bouton Supprimer (seulement si objet sélectionné)
         if (scene.get_selected() != nullptr) {
             if (ImGui::Button("Supprimer l'objet", ImVec2(-1, 0))) {

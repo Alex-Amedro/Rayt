@@ -6,6 +6,7 @@
 #include "preview/shader_manager.hpp"
 #include "preview/sphere.hpp"
 #include "preview/plane.hpp"
+#include "preview/grid.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
@@ -16,6 +17,7 @@
 Scene::Scene()
     : selected_index(-1)  // Aucun objet sélectionné
     , wireframe_enabled(true)  // Wireframe activé par défaut
+    , grid_enabled(true)  // Grille activée par défaut
 {
 }
 
@@ -128,9 +130,16 @@ SceneObject* Scene::get_selected() {
 // RENDU DE TOUS LES OBJETS
 // ============================================================================
 
-void Scene::render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_mesh) {
+void Scene::render_all(ShaderManager& shader, Sphere& sphere_mesh, Plane& plane_mesh, Grid& grid_mesh) {
     shader.use();
-    
+    if (grid_enabled) {
+        // Dessiner la grille
+        glm::mat4 model = glm::mat4(1.0f);
+        shader.set_uniform_matrix4fv("model", glm::value_ptr(model));
+        shader.set_uniform_3f("objectColor", 0.7f, 0.7f, 0.7f);  // Gris clair
+        grid_mesh.draw();
+    }
+
     for (SceneObject* obj : objects) {
         // 1. Envoyer la matrice model (position + échelle)
         glm::mat4 model = obj->get_model_matrix();
@@ -197,7 +206,12 @@ void Scene::clear() {
 
 void Scene::create_default_scene() {
     clear();
-    
+    //  Grid 
+    SceneObject* grid = new SceneObject(ObjectType::PLANE, "Grille");
+    grid->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    grid->color = glm::vec3(0.0f, 0.0f, 0.0f);  // Gris
+    add_object(grid);
+
     // Sphère rouge
     SceneObject* sphere1 = new SceneObject(ObjectType::SPHERE, "Sphère Rouge");
     sphere1->position = glm::vec3(-2.0f, 0.0f, -5.0f);

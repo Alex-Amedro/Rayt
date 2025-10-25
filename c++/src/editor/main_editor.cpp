@@ -1,30 +1,10 @@
-// ============================================================================
-// ÉDITEUR DE SCÈNE - MAIN
-// ============================================================================
-//
-// Ce programme combine :
-// - OpenGL pour le rendu 3D en temps réel (preview)
-// - ImGui pour l'interface graphique (menu)
-// - Une scène éditable (ajouter/modifier des objets)
-// - Des contrôles caméra (ZQSD + souris)
-//
-// Layout :
-// ┌──────────────────────────────────┬──────────┐
-// │ Viewport 3D (OpenGL)             │  Menu UI │
-// │ - Fond gris                      │  (ImGui) │
-// │ - Objets de la scène             │          │
-// │ - Contrôles ZQSD + souris        │  1/5     │
-// │ 4/5 largeur                      │  largeur │
-// └──────────────────────────────────┴──────────┘
-//
-// ============================================================================
-
 #include "preview/window.hpp"
 #include "preview/shader_manager.hpp"
 #include "preview/renderer.hpp"
 #include "preview/camera_gl.hpp"
 #include "preview/sphere.hpp"
 #include "preview/plane.hpp"
+#include "preview/grid.hpp"
 #include "editor/scene.hpp"
 #include "editor/editor_ui.hpp"
 #include "editor/camera_controller.hpp"
@@ -53,6 +33,7 @@ int main() {
     // 2. CHARGER LES SHADERS
     // ====================================================================
     ShaderManager shader;
+
     if (!shader.load_shaders("src/preview/shaders/vertex.glsl", 
                              "src/preview/shaders/fragment.glsl")) {
         return -1;
@@ -63,6 +44,7 @@ int main() {
     // ====================================================================
     Sphere sphere_mesh;
     Plane plane_mesh(10.0f);  // Plan de 10x10 unités
+    Grid grid(10.0f, 10);     // Grille de 10x10 unités, 10 divisions
     
     // ====================================================================
     // 4. CRÉER LA CAMÉRA ET SON CONTRÔLEUR
@@ -202,7 +184,7 @@ int main() {
         // ================================================================
         // 9.5 DESSINER TOUS LES OBJETS DE LA SCÈNE
         // ================================================================
-        scene.render_all(shader, sphere_mesh, plane_mesh);
+        scene.render_all(shader, sphere_mesh, plane_mesh, grid);
         
         // ================================================================
         // 9.6 DESSINER L'INTERFACE IMGUI
