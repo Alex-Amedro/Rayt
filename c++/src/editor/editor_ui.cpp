@@ -10,6 +10,7 @@
 
 EditorUI::EditorUI(Scene& s)
     : scene(s)
+    , gizmo(nullptr)
     , show_add_menu(true)
     , show_properties(true)
 {
@@ -187,9 +188,15 @@ void EditorUI::render_properties() {
         // POSITION (exemple fait par moi)
         // ====================================================================
         ImGui::Text("Position");
-        ImGui::SliderFloat("X", &obj->position.x, -10.0f, 10.0f);
-        ImGui::SliderFloat("Y", &obj->position.y, -10.0f, 10.0f);
-        ImGui::SliderFloat("Z", &obj->position.z, -10.0f, 10.0f);
+        bool pos_changed = false;
+        pos_changed |= ImGui::SliderFloat("X", &obj->position.x, -10.0f, 10.0f);
+        pos_changed |= ImGui::SliderFloat("Y", &obj->position.y, -10.0f, 10.0f);
+        pos_changed |= ImGui::SliderFloat("Z", &obj->position.z, -10.0f, 10.0f);
+        
+        // Mettre à jour le gizmo si la position a changé
+        if (pos_changed && gizmo != nullptr) {
+            gizmo->set_position(obj->position);
+        }
         
         ImGui::Spacing();
         

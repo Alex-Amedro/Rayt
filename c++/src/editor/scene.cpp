@@ -104,7 +104,6 @@ void Scene::select_object(int index) {
     selected_index = index;
     if (index != -1 && index < (int)objects.size()) {
         objects[index]->selected = true;
-        std::cout << "Objet sélectionné : " << objects[index]->name << "\n";
     }
 }
 
@@ -236,9 +235,6 @@ int Scene::pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction) {
     int closest_index = -1;
     float closest_distance = std::numeric_limits<float>::max();
     
-    std::cout << "[RAY PICKING] Rayon origine: (" << ray_origin.x << ", " << ray_origin.y << ", " << ray_origin.z << ")\n";
-    std::cout << "[RAY PICKING] Direction: (" << ray_direction.x << ", " << ray_direction.y << ", " << ray_direction.z << ")\n";
-    
     for (int i = 0; i < (int)objects.size(); i++){
         SceneObject* obj = objects[i];
         float t_hit;
@@ -248,14 +244,8 @@ int Scene::pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction) {
             // La sphère a un rayon de 1.0, et obj->size est un multiplicateur
             float effective_radius = 1.0f * obj->size;
             hit = ray_sphere_intersection(ray_origin, ray_direction, obj->position, effective_radius, t_hit);
-            if (hit) {
-                std::cout << "[RAY PICKING] Sphère " << i << " (" << obj->name << ") touchée à t=" << t_hit << "\n";
-            }
         }else if( obj -> type == ObjectType::PLANE){
             hit = ray_plane_intersection(ray_origin, ray_direction, obj->position, glm::vec3(0,1,0), obj->size, t_hit);
-            if (hit) {
-                std::cout << "[RAY PICKING] Plan " << i << " (" << obj->name << ") touché à t=" << t_hit << "\n";
-            }
         }
         if (hit && t_hit < closest_distance){
             closest_distance = t_hit;
@@ -263,6 +253,5 @@ int Scene::pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction) {
         }
     }
     
-    std::cout << "[RAY PICKING] Objet sélectionné : " << closest_index << "\n";
     return closest_index;
 }

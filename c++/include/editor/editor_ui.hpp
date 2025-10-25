@@ -24,6 +24,7 @@
 #pragma once
 
 #include "scene.hpp"
+#include "gizmo.hpp"
 #include <GLFW/glfw3.h>
 
 // ============================================================================
@@ -33,6 +34,7 @@
 class EditorUI {
 private:
     Scene& scene;  // Référence à la scène (pour ajouter/modifier des objets)
+    Gizmo* gizmo;  // Référence au gizmo (pour mettre à jour sa position)
     
     // ====================================================================
     // ÉTAT DE L'INTERFACE
@@ -45,6 +47,11 @@ public:
     // CONSTRUCTEUR
     // ====================================================================
     EditorUI(Scene& s);
+    
+    // ====================================================================
+    // SETTER
+    // ====================================================================
+    void set_gizmo(Gizmo* g) { gizmo = g; }
     
     // ====================================================================
     // INITIALISATION / NETTOYAGE IMGUI

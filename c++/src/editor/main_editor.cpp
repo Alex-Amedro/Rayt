@@ -8,6 +8,7 @@
 #include "editor/scene.hpp"
 #include "editor/editor_ui.hpp"
 #include "editor/camera_controller.hpp"
+#include "editor/gizmo.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -73,6 +74,12 @@ int main() {
     EditorUI ui(scene);
     
     // ====================================================================
+    // 5.5. CRÉER LE GIZMO POUR LA TRANSFORMATION
+    // ====================================================================
+    Gizmo gizmo(2.0f);  // Longueur des axes = 2.0
+    ui.set_gizmo(&gizmo);  // Donner le gizmo à l'UI pour qu'elle le mette à jour
+    
+    // ====================================================================
     // 6. ENVOYER LES MATRICES À LA CAMÉRA (une seule fois)
     // ====================================================================
     shader.use();
@@ -96,11 +103,18 @@ int main() {
         CameraController* controller;
         Scene* scene;
         CameraGL* camera;
+        Gizmo* gizmo;
         int window_width;
         int window_height;
+        bool dragging_gizmo;          // Est-ce qu'on est en train de drag un axe ?
+        int dragging_axis;            // Quel axe ? (-1 = aucun, 0=X, 1=Y, 2=Z)
+        glm::vec3 drag_start_pos;     // Position de l'objet au début du drag
+        glm::vec3 drag_start_gizmo;   // Position du gizmo au début du drag (référence fixe)
+        double last_mouse_x;          // Position souris précédente pour calcul incrémental
+        double last_mouse_y;
     };
     
-    CallbackData cb_data = {&controller, &scene, &camera, 1600, 900};
+    CallbackData cb_data = {&controller, &scene, &camera, &gizmo, 1600, 900, false, -1, glm::vec3(0), glm::vec3(0), 0, 0};
     glfwSetWindowUserPointer(window.get_glfw_window(), &cb_data);
     
     // Callback souris : seulement si ImGui ne veut pas l'événement
@@ -115,26 +129,20 @@ int main() {
         
         auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
         
-        // CLIC GAUCHE = sélectionner un objet
+        // CLIC GAUCHE = sélectionner un objet OU manipuler le gizmo
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
             double mouse_x, mouse_y;
             glfwGetCursorPos(w, &mouse_x, &mouse_y);
             
-            // Récupérer la taille du viewport OpenGL (pas la fenêtre complète !)
-            // Le viewport exclut l'interface ImGui qui prend 20% à droite
+            // Récupérer la taille du viewport OpenGL
             GLint viewport[4];
             glGetIntegerv(GL_VIEWPORT, viewport);
             int viewport_width = viewport[2];
             int viewport_height = viewport[3];
             
-            std::cout << "\n[CLICK LEFT] Position souris : (" << mouse_x << ", " << mouse_y << ")\n";
-            std::cout << "[CLICK LEFT] Viewport OpenGL : " << viewport_width << "x" << viewport_height << "\n";
-            
             // Créer le rayon en utilisant la taille du viewport 3D
             float ndc_x = (2.0f * (float)mouse_x) / viewport_width - 1.0f;
             float ndc_y = 1.0f - (2.0f * (float)mouse_y) / viewport_height;  // Y inversé pour OpenGL
-            
-            std::cout << "[CLICK LEFT] NDC : (" << ndc_x << ", " << ndc_y << ")\n";
             
             glm::vec4 ray_clip(ndc_x, ndc_y, -1.0f, 1.0f);
             glm::vec4 ray_eye = glm::inverse(data->camera->get_projection_matrix()) * ray_clip;
@@ -145,15 +153,44 @@ int main() {
             );
             glm::vec3 ray_origin = data->camera->get_position();
             
-            // Détecter l'objet
+            // PRIORITÉ 1 : Tester les axes du gizmo si un objet est sélectionné
+            if (data->scene->get_selected() != nullptr) {
+                int axis = data->gizmo->pick_axis(ray_origin, ray_dir);
+                if (axis != -1) {
+                    // Commencer à déplacer sur cet axe
+                    data->dragging_gizmo = true;
+                    data->dragging_axis = axis;
+                    data->drag_start_pos = data->scene->get_selected()->position;
+                    data->drag_start_gizmo = data->gizmo->get_position();  // Position fixe de référence
+                    data->last_mouse_x = mouse_x;  // Sauvegarder position souris initiale
+                    data->last_mouse_y = mouse_y;
+                    std::cout << "🎯 DRAG DÉMARRÉ sur axe " << axis << " depuis position ("
+                              << data->drag_start_pos.x << ", " 
+                              << data->drag_start_pos.y << ", " 
+                              << data->drag_start_pos.z << ")" << std::endl;
+                    return;  // Ne pas tester les objets de la scène
+                }
+            }
+            
+            // PRIORITÉ 2 : Si aucun axe n'est touché, tester les objets
             int index = data->scene->pick_object(ray_origin, ray_dir);
             
             if (index >= 0) {
                 data->scene->select_object(index);
-                std::cout << "[CLICK LEFT] Objet sélectionné : " << index << "\n";
-            } else {
-                std::cout << "[CLICK LEFT] Aucun objet détecté\n";
+                // Mettre à jour la position du gizmo
+                SceneObject* obj = data->scene->get_object(index);
+                if (obj) {
+                    data->gizmo->set_position(obj->position);
+                }
             }
+        }
+        // CLIC GAUCHE RELÂCHÉ = arrêter le drag du gizmo
+        else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+            if (data->dragging_gizmo) {
+                std::cout << "🛑 DRAG TERMINÉ" << std::endl;
+            }
+            data->dragging_gizmo = false;
+            data->dragging_axis = -1;
         }
         // CLIC DROIT = rotation caméra
         else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -161,7 +198,7 @@ int main() {
         }
     });
 
-    // Callback mouvement : seulement si ImGui ne veut pas
+    // Callback mouvement : gestion du drag gizmo et rotation caméra
     glfwSetCursorPosCallback(window.get_glfw_window(), [](GLFWwindow* w, double x, double y) {
         ImGui_ImplGlfw_CursorPosCallback(w, x, y);
         
@@ -170,7 +207,77 @@ int main() {
         }
         
         auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
-        data->controller->on_mouse_move(x, y);
+        
+        // Si on est en train de déplacer avec le gizmo
+        if (data->dragging_gizmo && data->scene->get_selected() != nullptr) {
+            // Calculer le déplacement de la souris en pixels
+            double delta_mouse_x = x - data->last_mouse_x;
+            double delta_mouse_y = y - data->last_mouse_y;
+            
+            // Mettre à jour la dernière position
+            data->last_mouse_x = x;
+            data->last_mouse_y = y;
+            
+            // Convertir le mouvement souris en mouvement 3D
+            // Facteur de sensibilité : plus grand = plus rapide
+            float sensitivity = 0.07f;  // Compromis entre 0.005 et 0.05
+            
+            SceneObject* obj = data->scene->get_selected();
+            
+            // Calculer la direction de l'axe en espace écran pour déterminer le sens
+            glm::vec3 axes[3] = {
+                glm::vec3(1, 0, 0),  // X
+                glm::vec3(0, 1, 0),  // Y
+                glm::vec3(0, 0, 1)   // Z
+            };
+            
+            glm::vec3 axis_world = axes[data->dragging_axis];
+            glm::vec3 axis_end = obj->position + axis_world;
+            
+            // Projeter le début et la fin de l'axe en espace écran
+            glm::mat4 view = data->camera->get_view_matrix();
+            glm::mat4 proj = data->camera->get_projection_matrix();
+            glm::mat4 vp = proj * view;
+            
+            glm::vec4 pos_clip = vp * glm::vec4(obj->position, 1.0);
+            glm::vec4 end_clip = vp * glm::vec4(axis_end, 1.0);
+            
+            glm::vec2 pos_ndc = glm::vec2(pos_clip.x / pos_clip.w, pos_clip.y / pos_clip.w);
+            glm::vec2 end_ndc = glm::vec2(end_clip.x / end_clip.w, end_clip.y / end_clip.w);
+            
+            // Direction de l'axe en espace écran (NON normalisée pour garder la longueur)
+            glm::vec2 axis_screen_raw = end_ndc - pos_ndc;
+            float axis_screen_length = glm::length(axis_screen_raw);
+            
+            // Si l'axe est trop perpendiculaire à la vue (presque invisible), ignorer ce mouvement
+            if (axis_screen_length < 0.01f) {
+                data->last_mouse_x = x;
+                data->last_mouse_y = y;
+                return;
+            }
+            
+            glm::vec2 axis_screen = axis_screen_raw / axis_screen_length;  // Normaliser manuellement
+            
+            // Mouvement de la souris en NDC (-1 à 1)
+            GLint viewport[4];
+            glGetIntegerv(GL_VIEWPORT, viewport);
+            glm::vec2 mouse_delta_ndc(
+                (float)delta_mouse_x / viewport[2] * 2.0f,
+                -(float)delta_mouse_y / viewport[3] * 2.0f  // Y inversé
+            );
+            
+            // Projeter le mouvement souris sur la direction de l'axe
+            float movement = glm::dot(mouse_delta_ndc, axis_screen);
+            
+            // Appliquer le mouvement sur l'axe approprié (SANS compensation, c'était trop)
+            obj->position += axis_world * (movement * sensitivity * 100.0f);
+            
+            // Mettre à jour le gizmo pour suivre l'objet
+            data->gizmo->set_position(obj->position);
+        } else {
+            // Sinon, comportement normal (rotation caméra)
+            data->controller->on_mouse_move(x, y);
+        }
     });
     
     // Callback molette : seulement si ImGui ne veut pas
@@ -253,6 +360,13 @@ int main() {
         // 9.5 DESSINER TOUS LES OBJETS DE LA SCÈNE
         // ================================================================
         scene.render_all(shader, sphere_mesh, plane_mesh, grid);
+        
+        // ================================================================
+        // 9.5.5 DESSINER LE GIZMO SI UN OBJET EST SÉLECTIONNÉ
+        // ================================================================
+        if (scene.get_selected() != nullptr) {
+            gizmo.draw(shader);
+        }
         
         // ================================================================
         // 9.6 DESSINER L'INTERFACE IMGUI

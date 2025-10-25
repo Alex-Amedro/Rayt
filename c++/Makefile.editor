@@ -57,11 +57,12 @@ PREVIEW_SRC = src/preview/window.cpp \
               src/preview/plane.cpp \
               src/preview/grid.cpp
 
-# Editor (scene, scene_object, editor_ui, camera_controller)
+# Editor (scene, scene_object, editor_ui, camera_controller, gizmo)
 EDITOR_SRC = src/editor/scene_object.cpp \
              src/editor/scene.cpp \
              src/editor/editor_ui.cpp \
              src/editor/camera_controller.cpp \
+             src/editor/gizmo.cpp \
              src/editor/main_editor.cpp
 
 # Tous les .cpp
