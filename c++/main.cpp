@@ -16,6 +16,7 @@ using json = nlohmann::json;
 #include "core/camera.hpp"
 #include "geometry/hittable.hpp"
 #include "core/ray_color.hpp"
+#include "core/denoise.hpp"
 #include "geometry/sphere.hpp"
 #include "geometry/plane.hpp"
 #include "materials/material.hpp"
@@ -133,6 +134,20 @@ int main() {
     if (scene_data["render"].contains("ambient_light")) {
         ambient_light = scene_data["render"]["ambient_light"];
     }
+    
+    // Denoise settings (default: disabled)
+    bool enable_denoise = false;
+    int denoise_type = 1;  // 0=Box, 1=Gaussian, 2=Bilateral
+    float denoise_strength = 1.0f;
+    if (scene_data["render"].contains("enable_denoise")) {
+        enable_denoise = scene_data["render"]["enable_denoise"];
+    }
+    if (scene_data["render"].contains("denoise_type")) {
+        denoise_type = scene_data["render"]["denoise_type"];
+    }
+    if (scene_data["render"].contains("denoise_strength")) {
+        denoise_strength = scene_data["render"]["denoise_strength"];
+    }
 
     vec3 lookfrom(
         scene_data["camera"]["origin"]["x"],
@@ -201,9 +216,8 @@ int main() {
     }
     
 
-    // Output file
-    std::ofstream file("image.ppm");
-    file << "P3\n" << image_width << " " << image_height << "\n255\n";
+    // Store pixels in memory for denoising
+    std::vector<vec3> pixels(image_width * image_height);
 
     // Render loop
     for (int y = image_height - 1; y >= 0; --y) {
@@ -236,16 +250,43 @@ int main() {
             avg_color.y = std::pow(avg_color.y, 1.0 / gamma);
             avg_color.z = std::pow(avg_color.z, 1.0 / gamma);
 
+            // Store pixel (flip y for correct orientation)
+            pixels[(image_height - 1 - y) * image_width + x] = avg_color;
+        }
+    }
+    
+    // Apply denoising if enabled
+    if (enable_denoise) {
+        std::cout << "\n\n🔧 Applying denoise filter...";
+        if (denoise_type == 0) {
+            pixels = denoise::box_blur(pixels, image_width, image_height, static_cast<int>(denoise_strength));
+        } else if (denoise_type == 1) {
+            pixels = denoise::gaussian_blur(pixels, image_width, image_height, denoise_strength);
+        } else if (denoise_type == 2) {
+            pixels = denoise::bilateral_filter(pixels, image_width, image_height, denoise_strength, 0.1f);
+        }
+        std::cout << " Done!\n";
+    }
+    
+    // Output file
+    std::ofstream file("image.ppm");
+    file << "P3\n" << image_width << " " << image_height << "\n255\n";
+    
+    // Write pixels to file
+    for (int y = 0; y < image_height; ++y) {
+        for (int x = 0; x < image_width; ++x) {
+            vec3 color = pixels[y * image_width + x];
+            
             // Convert to [0, 255] with clamping
-            int r = static_cast<int>(256.0 * std::clamp(avg_color.x, 0.0, 0.999));
-            int g = static_cast<int>(256.0 * std::clamp(avg_color.y, 0.0, 0.999));
-            int b = static_cast<int>(256.0 * std::clamp(avg_color.z, 0.0, 0.999));
+            int r = static_cast<int>(256.0 * std::clamp(color.x, 0.0, 0.999));
+            int g = static_cast<int>(256.0 * std::clamp(color.y, 0.0, 0.999));
+            int b = static_cast<int>(256.0 * std::clamp(color.z, 0.0, 0.999));
             
             file << r << " " << g << " " << b << "\n";
         }
     }
     
-    std::cout << "\n\n✓ Render complete! Image saved as 'image.ppm'\n";
+    std::cout << "\n✓ Render complete! Image saved as 'image.ppm'\n";
     file.close();
     return 0;
 }

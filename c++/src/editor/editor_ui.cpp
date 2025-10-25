@@ -330,6 +330,14 @@ void EditorUI::render_actions() {
             ImGui::Text("Post-Processing");
             ImGui::SliderFloat("Gamma", &gamma, 1.0f, 3.0f);
             
+            ImGui::Checkbox("Denoise (Anti-Bruit)", &enable_denoise);
+            if (enable_denoise) {
+                const char* denoise_types[] = { "Box Blur", "Gaussian (Recommandé)", "Bilateral (Lent)" };
+                ImGui::Combo("Type", &denoise_type, denoise_types, 3);
+                ImGui::SliderFloat("Force", &denoise_strength, 0.5f, 3.0f);
+                ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Réduit le bruit des néons");
+            }
+            
             ImGui::Spacing();
             ImGui::Text("Performance");
             ImGui::InputInt("Threads", &num_threads);
@@ -368,6 +376,9 @@ void EditorUI::render_actions() {
                 scene_data["render"]["sun_intensity"] = sun_intensity;
                 scene_data["render"]["ambient_light"] = ambient_light;
                 scene_data["render"]["gamma"] = gamma;
+                scene_data["render"]["enable_denoise"] = enable_denoise;
+                scene_data["render"]["denoise_type"] = denoise_type;
+                scene_data["render"]["denoise_strength"] = denoise_strength;
                 scene_data["render"]["num_threads"] = num_threads;
 
                 //scene_data["environment"]["background"] = background_color;

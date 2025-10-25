@@ -62,6 +62,11 @@ private:
     float ambient_light = 1.0f;  // 1.0 = full sky, 0.0 = black (for dramatic neon scenes)
     float gamma = 2.2f;
     
+    // Post-processing
+    bool enable_denoise = false;
+    int denoise_type = 1;  // 0=Box, 1=Gaussian, 2=Bilateral
+    float denoise_strength = 1.0f;  // 0.5-2.0
+    
     // Performance
     int num_threads = 8;
     

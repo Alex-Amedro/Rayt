@@ -1,0 +1,50 @@
+{
+    "camera": {
+        "origin": {"x": 0, "y": 2, "z": 5},
+        "look_at": {"x": 0, "y": 1, "z": 0},
+        "up": {"x": 0, "y": 1, "z": 0},
+        "fov": 45,
+        "aspect_ratio": 1.777,
+        "aperture": 0,
+        "focus_distance": 10
+    },
+    "render": {
+        "image_width": 400,
+        "image_height": 225,
+        "samples_per_pixel": 50,
+        "max_depth": 5,
+        "ambient_light": 0.2,
+        "gamma": 2.2,
+        "enable_denoise": true,
+        "denoise_type": 1,
+        "denoise_strength": 1.5,
+        "num_threads": 4
+    },
+    "objects": [
+        {
+            "type": "Plan",
+            "name": "Sol",
+            "position": {"x": 0, "y": 0, "z": 0},
+            "color": {"r": 0.5, "g": 0.5, "b": 0.5},
+            "size": 10,
+            "material": "Diffus"
+        },
+        {
+            "type": "Sphère",
+            "name": "Néon Rouge",
+            "position": {"x": -1.5, "y": 1, "z": 0},
+            "color": {"r": 1, "g": 0.1, "b": 0.1},
+            "size": 0.5,
+            "material": "Néon",
+            "emission_strength": 5
+        },
+        {
+            "type": "Sphère",
+            "name": "Chrome",
+            "position": {"x": 1, "y": 0.7, "z": 0.5},
+            "color": {"r": 1, "g": 1, "b": 1},
+            "size": 0.7,
+            "material": "Miroir"
+        }
+    ]
+}
