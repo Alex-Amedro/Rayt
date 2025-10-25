@@ -22,6 +22,8 @@ using json = nlohmann::json;
 #include "materials/diffuse.hpp"
 #include "materials/metal.hpp"
 #include "materials/dielectric.hpp"
+#include "materials/emissive.hpp"
+#include "materials/mirror.hpp"
 
 // Global random number generator for all materials
 std::random_device rd;
@@ -72,6 +74,25 @@ void show_progress_bar(int current, int total) {
               << current << "/" << total << ")" << std::flush;
 }
 
+vec3 aces_tonemap(const vec3& color) {
+    // ACES filmic tone mapping curve
+    // Référence: Narkowicz 2015 "ACES Filmic Tone Mapping Curve"
+    const double a = 2.51;
+    const double b = 0.03;
+    const double c = 2.43;
+    const double d = 0.59;
+    const double e = 0.14;
+    
+    vec3 x = color;
+    vec3 numerator = x * (x * a + b);      // Fix: pas de parenthèses en trop
+    vec3 denominator = x * (x * c + d) + e;
+    
+    return vec3(
+        numerator.x / denominator.x,
+        numerator.y / denominator.y,
+        numerator.z / denominator.z
+    );
+}
 // ==================== END USER INTERFACE ====================
 
 int main() {
@@ -79,7 +100,7 @@ int main() {
     // Display menu
     display_menu();
     
-    std::string scene_file = "src/data/save/save1.json";
+    std::string scene_file = "src/data/save/demo_scene.json";
     std::ifstream ifs(scene_file);
 
     if (!ifs.is_open()) {
@@ -106,6 +127,12 @@ int main() {
     int max_depth = scene_data["render"]["max_depth"];
     int num_threads = scene_data["render"]["num_threads"];
     double gamma = scene_data["render"]["gamma"];
+    
+    // Ambient light control (default 1.0 if not in JSON)
+    double ambient_light = 1.0;
+    if (scene_data["render"].contains("ambient_light")) {
+        ambient_light = scene_data["render"]["ambient_light"];
+    }
 
     vec3 lookfrom(
         scene_data["camera"]["origin"]["x"],
@@ -154,6 +181,11 @@ int main() {
         } else if (mat_type == "Verre") {
             double ir = obj.contains("refraction_index") ? double(obj["refraction_index"]) : 1.5;
             mat = std::make_shared<dielectric>(ir, color);
+        } else if (mat_type == "Néon" || mat_type == "Neon" || mat_type == "Emissive") {
+            double strength = obj.contains("emission_strength") ? double(obj["emission_strength"]) : 5.0;
+            mat = std::make_shared<emissive>(color, strength);
+        } else if (mat_type == "Miroir" || mat_type == "Mirror") {
+            mat = std::make_shared<mirror>(color);
         } else {
             // Matériau par défaut si inconnu
             mat = std::make_shared<diffuse>(color);
@@ -188,15 +220,18 @@ int main() {
                 double v = (double(y) + distribution(generator)) / (image_height - 1);
 
                 vec3 ray_direction = camera.get_ray_direction(u, v);
-                vec3 pixel_color = ray_color(camera.origin, ray_direction, scene_objects, max_depth);
+                vec3 pixel_color = ray_color(camera.origin, ray_direction, scene_objects, max_depth, ambient_light);
 
                 total_color = total_color + pixel_color;
             }
 
             // Average color across all samples
             vec3 avg_color = total_color / samples_per_pixel;
+            
+            // ACES Tone Mapping (HDR → LDR avec préservation des détails)
+            avg_color = aces_tonemap(avg_color);
 
-            // Apply gamma correction (avg_color is already in [0, 1])
+            // Apply gamma correction APRÈS tone mapping
             avg_color.x = std::pow(avg_color.x, 1.0 / gamma);
             avg_color.y = std::pow(avg_color.y, 1.0 / gamma);
             avg_color.z = std::pow(avg_color.z, 1.0 / gamma);

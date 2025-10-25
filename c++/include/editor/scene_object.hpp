@@ -38,7 +38,9 @@ enum class ObjectType {
 enum class MaterialType {
     DIFFUSE,
     METAL,
-    DIELECTRIC  // Verre
+    DIELECTRIC,  // Verre
+    EMISSIVE,    // Néon, LED, sources lumineuses
+    MIRROR       // Miroir parfait (chrome)
 };
 
 // ============================================================================
@@ -60,6 +62,7 @@ public:
     MaterialType material;
     float roughness;            // Pour le métal (0 = lisse, 1 = rugueux)
     float refraction_index;     // Pour le verre (1.5 = verre normal)
+    float emission_strength;    // Pour émissif (5.0 = néon classique, 10.0+ = très brillant)
     
     bool selected;              // Est-il sélectionné dans l'éditeur ?
     

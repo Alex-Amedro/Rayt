@@ -37,7 +37,8 @@ vec3 ray_color(
     const vec3& ray_origin,
     const vec3& ray_direction,
     const std::vector<std::shared_ptr<hittable>>& scene,
-    int depth
+    int depth,
+    double ambient_light
 ) {
     // Recursion depth limit
     if (depth <= 0) {
@@ -60,6 +61,9 @@ vec3 ray_color(
         vec3 hit_point = ray_origin + (ray_direction * t_min);
         vec3 hit_normal = closest_object->get_normal(hit_point);
 
+        // Get emitted light from material (neon, LEDs, etc.)
+        vec3 emitted = closest_object->mat->emitted();
+
         vec3 attenuation;
         vec3 scattered_direction;
 
@@ -77,25 +81,27 @@ vec3 ray_color(
                                           : (hit_normal * -hittable::epsilon);
             vec3 next_origin = hit_point + offset;
             
-            vec3 color_from_scatter = ray_color(next_origin, scattered_direction, scene, depth - 1);
+            vec3 color_from_scatter = ray_color(next_origin, scattered_direction, scene, depth - 1, ambient_light);
             
             // Apply material attenuation (albedo already in [0, 1] range)
             double r = attenuation.x * color_from_scatter.x;
             double g = attenuation.y * color_from_scatter.y;
             double b = attenuation.z * color_from_scatter.z;
             
-            return vec3(r, g, b);
+            // Add emitted light (for emissive materials like neon)
+            return vec3(r, g, b) + emitted;
         } else {
-            // Material absorbed the ray
-            return vec3(0, 0, 0);
+            // Material absorbed the ray (e.g., emissive material)
+            // Return only the emitted light
+            return emitted;
         }
     }
     
-    // No hit - return sky gradient
+    // No hit - return sky gradient (ambient light)
     vec3 unit_direction = ray_direction.normalize();
     double t_sky = 0.5 * (unit_direction.y + 1.0);
 
-    // Sky colors in [0, 1] range
+    // Sky colors in [0, 1] range, modulated by ambient_light
     vec3 color_white(1.0, 1.0, 1.0);
     vec3 color_blue(0.5, 0.7, 1.0);
 
@@ -103,5 +109,5 @@ vec3 ray_color(
     double g = (1.0 - t_sky) * color_white.y + t_sky * color_blue.y;
     double b = (1.0 - t_sky) * color_white.z + t_sky * color_blue.z;
 
-    return vec3(r, g, b);
+    return vec3(r, g, b) * ambient_light;
 }

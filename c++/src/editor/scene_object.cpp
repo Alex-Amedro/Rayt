@@ -18,6 +18,7 @@ SceneObject::SceneObject()
     , material(MaterialType::DIFFUSE)
     , roughness(0.0f)
     , refraction_index(1.5f)   // Verre normal
+    , emission_strength(5.0f)  // Néon classique
     , selected(false)
 {
 }
@@ -35,6 +36,7 @@ SceneObject::SceneObject(ObjectType t, const std::string& n)
     , material(MaterialType::DIFFUSE)
     , roughness(0.0f)
     , refraction_index(1.5f)
+    , emission_strength(5.0f)
     , selected(false)
 {
     // Valeurs par défaut selon le type
@@ -81,6 +83,8 @@ std::string SceneObject::get_material_name() const {
         case MaterialType::DIFFUSE:     return "Diffus";
         case MaterialType::METAL:       return "Métal";
         case MaterialType::DIELECTRIC:  return "Verre";
+        case MaterialType::EMISSIVE:    return "Néon";
+        case MaterialType::MIRROR:      return "Miroir";
         default:                        return "Inconnu";
     }
 }

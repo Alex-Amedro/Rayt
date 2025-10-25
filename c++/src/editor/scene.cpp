@@ -313,6 +313,13 @@ void Scene::load_from_json(const std::string& filepath) {
                         if (obj_data.contains("refraction_index")) {
                             obj->refraction_index = obj_data["refraction_index"];
                         }
+                    } else if (material_name == "Néon" || material_name == "Neon" || material_name == "Emissive") {
+                        obj->material = MaterialType::EMISSIVE;
+                        if (obj_data.contains("emission_strength")) {
+                            obj->emission_strength = obj_data["emission_strength"];
+                        }
+                    } else if (material_name == "Miroir" || material_name == "Mirror") {
+                        obj->material = MaterialType::MIRROR;
                     } else {
                         obj->material = MaterialType::DIFFUSE;
                     }

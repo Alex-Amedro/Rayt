@@ -18,5 +18,6 @@ public:
     vec3 operator/(double div) const;
     vec3 operator*(double mul) const;
     vec3 operator*(vec3 mul) const;
+    vec3 operator+(double constant) const;
 };
 

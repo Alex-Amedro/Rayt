@@ -59,6 +59,7 @@ private:
     
     // Environment
     float sun_intensity = 1.0f;
+    float ambient_light = 1.0f;  // 1.0 = full sky, 0.0 = black (for dramatic neon scenes)
     float gamma = 2.2f;
     
     // Performance

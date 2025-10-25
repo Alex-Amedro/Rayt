@@ -14,4 +14,9 @@ public:
         vec3& attenuation,
         vec3& scattered_direction
     ) const = 0;
+
+    // Return emitted light (default: black = no emission)
+    virtual vec3 emitted() const {
+        return vec3(0.0, 0.0, 0.0);
+    }
 };

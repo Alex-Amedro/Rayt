@@ -1,233 +1,168 @@
 {
-  "name": "Demo Scene - Photoréaliste",
-  "description": "Scène de test complète avec matériaux variés et éclairage dramatique",
-  
-  "camera": {
-    "origin": {"x": 0.0, "y": 2.5, "z": 9.0},
-    "look_at": {"x": 0.0, "y": 1.5, "z": 0.0},
-    "up": {"x": 0.0, "y": 1.0, "z": 0.0},
-    "fov": 35.0,
-    "aspect_ratio": 1.777777
-  },
-  
-  "render": {
-    "image_width": 1920,
-    "image_height": 1080,
-    "samples_per_pixel": 500,
-    "max_depth": 50,
-    "gamma": 2.2,
-    "threads": 8
-  },
-  
-  "lights": [
-    {
-      "name": "Main Light",
-      "type": "point",
-      "position": {"x": 0.0, "y": 3.9, "z": 1.0},
-      "color": {"r": 1.0, "g": 1.0, "b": 1.0},
-      "intensity": 25.0,
-      "comment": "Lumière principale blanche (plafond)"
-    },
-    {
-      "name": "Fill Light",
-      "type": "point",
-      "position": {"x": -3.0, "y": 2.0, "z": 3.0},
-      "color": {"r": 1.0, "g": 0.7, "b": 0.5},
-      "intensity": 8.0,
-      "comment": "Lumière d'appoint chaude (gauche)"
-    },
-    {
-      "name": "Rim Light",
-      "type": "point",
-      "position": {"x": 2.0, "y": 1.5, "z": -2.0},
-      "color": {"r": 0.5, "g": 0.7, "b": 1.0},
-      "intensity": 6.0,
-      "comment": "Lumière de contour froide (arrière)"
-    }
-  ],
-  
-  "objects": [
-    {
-      "name": "Sol - Checker",
-      "type": "Plan",
-      "position": {"x": 0.0, "y": 0.0, "z": 0.0},
-      "normal": {"x": 0.0, "y": 1.0, "z": 0.0},
-      "color": {"r": 0.8, "g": 0.8, "b": 0.8},
-      "material": "Diffus",
-      "comment": "TODO: Ajouter texture checker quand implémenté"
-    },
-    
-    {
-      "name": "Mur Arrière",
-      "type": "Plan",
-      "position": {"x": 0.0, "y": 0.0, "z": -4.0},
-      "normal": {"x": 0.0, "y": 0.0, "z": 1.0},
-      "color": {"r": 0.7, "g": 0.7, "b": 0.7},
-      "material": "Diffus"
-    },
-    
-    {
-      "name": "Plafond",
-      "type": "Plan",
-      "position": {"x": 0.0, "y": 4.0, "z": 0.0},
-      "normal": {"x": 0.0, "y": -1.0, "z": 0.0},
-      "color": {"r": 0.9, "g": 0.9, "b": 0.9},
-      "material": "Diffus"
-    },
-    
-    {
-      "name": "Sphère Métal Poli (Chrome)",
-      "type": "Sphère",
-      "position": {"x": -2.0, "y": 1.0, "z": 0.0},
-      "size": 1.0,
-      "color": {"r": 0.95, "g": 0.95, "b": 0.95},
-      "material": "Métal",
-      "fuzz": 0.05,
-      "comment": "Métal ultra poli - reflets miroir"
-    },
-    
-    {
-      "name": "Sphère Verre (Cristal)",
-      "type": "Sphère",
-      "position": {"x": 0.0, "y": 1.0, "z": 0.5},
-      "size": 1.0,
-      "color": {"r": 1.0, "g": 1.0, "b": 1.0},
-      "material": "Verre",
-      "ior": 1.5,
-      "comment": "Verre transparent avec réfraction"
-    },
-    
-    {
-      "name": "Sphère Or Brossé",
-      "type": "Sphère",
-      "position": {"x": 2.0, "y": 1.0, "z": -0.5},
-      "size": 1.0,
-      "color": {"r": 1.0, "g": 0.85, "b": 0.57},
-      "material": "Métal",
-      "fuzz": 0.3,
-      "comment": "Or avec roughness modéré"
-    },
-    
-    {
-      "name": "Petite Sphère Rouge (Plastique)",
-      "type": "Sphère",
-      "position": {"x": -1.0, "y": 0.4, "z": 2.0},
-      "size": 0.4,
-      "color": {"r": 0.8, "g": 0.1, "b": 0.1},
-      "material": "Diffus",
-      "comment": "Simule plastique mat - TODO: PBR avec roughness 0.3"
-    },
-    
-    {
-      "name": "Petite Sphère Verte (Céramique)",
-      "type": "Sphère",
-      "position": {"x": 1.0, "y": 0.4, "z": 2.0},
-      "size": 0.4,
-      "color": {"r": 0.1, "g": 0.8, "b": 0.1},
-      "material": "Diffus",
-      "comment": "Simule céramique - TODO: PBR avec roughness 0.6"
-    },
-    
-    {
-      "name": "Petite Sphère Cuivre",
-      "type": "Sphère",
-      "position": {"x": 0.0, "y": 0.3, "z": 3.0},
-      "size": 0.3,
-      "color": {"r": 0.95, "g": 0.64, "b": 0.54},
-      "material": "Métal",
-      "fuzz": 0.2,
-      "comment": "Cuivre poli"
-    }
-  ],
-  
-  "post_process": {
-    "tone_mapping": "aces",
-    "comment": "TODO: Implémenter ACES tone mapping dans main.cpp"
-  },
-  
-  "notes": [
-    "Cette scène teste tous les matériaux actuels",
-    "3 lumières pour éclairage dramatique (key + fill + rim)",
-    "Disposition en arc pour comparaison visuelle",
-    "Après implémentation PBR: remplacer matériaux par PBR avec roughness/metallic",
-    "Après triangles: ajouter Stanford Bunny au centre (position y=0, z=-1)"
-  ],
-  
-  "evolution_future": {
-    "phase_1_pbr": {
-      "description": "Remplacer Diffus/Métal par PBR unifié",
-      "exemple": {
-        "type": "PBR",
-        "albedo": {"r": 0.8, "g": 0.1, "b": 0.1},
-        "roughness": 0.3,
-        "metallic": 0.0
-      }
-    },
-    
-    "phase_2_triangles": {
-      "description": "Ajouter modèle 3D au centre",
-      "objet": {
-        "name": "Stanford Bunny",
-        "type": "Mesh",
-        "file": "models/bunny.obj",
-        "position": {"x": 0.0, "y": 0.0, "z": -1.0},
-        "scale": 2.0,
-        "material": {
-          "type": "PBR",
-          "albedo": {"r": 0.7, "g": 0.6, "b": 0.5},
-          "roughness": 0.7,
-          "metallic": 0.0
+    "camera": {
+        "aperture": 0.0,
+        "aspect_ratio": 1.7777777777777777,
+        "focus_distance": 10.0,
+        "fov": 47.0,
+        "look_at": {
+            "x": 0.08116395771503448,
+            "y": 2.2884037494659424,
+            "z": 4.199074745178223
+        },
+        "origin": {
+            "x": 0.023670241236686707,
+            "y": 2.6903514862060547,
+            "z": 5.112930774688721
+        },
+        "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
         }
-      }
     },
-    
-    "phase_3_textures": {
-      "description": "Sol avec checker pattern",
-      "sol_ameliore": {
-        "type": "Plan",
-        "material": {
-          "type": "PBR",
-          "texture": "checker",
-          "color1": {"r": 0.9, "g": 0.9, "b": 0.9},
-          "color2": {"r": 0.2, "g": 0.2, "b": 0.2},
-          "scale": 0.5
+    "objects": [
+        {
+            "color": {
+                "b": 0.949999988079071,
+                "g": 0.949999988079071,
+                "r": 0.949999988079071
+            },
+            "material": "Diffus",
+            "name": "Plan",
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "size": 20.0,
+            "type": "Plan"
+        },
+        {
+            "color": {
+                "b": 0.05000000074505806,
+                "g": 0.05000000074505806,
+                "r": 1.0
+            },
+            "emission_strength": 10.440999984741211,
+            "material": "Néon",
+            "name": "Néon Rouge",
+            "position": {
+                "x": -2.5,
+                "y": 1.0,
+                "z": 0.0
+            },
+            "size": 0.5,
+            "type": "Sphère"
+        },
+        {
+            "color": {
+                "b": 1.0,
+                "g": 0.800000011920929,
+                "r": 0.05000000074505806
+            },
+            "emission_strength": 10.204999923706055,
+            "material": "Néon",
+            "name": "Néon Cyan",
+            "position": {
+                "x": 0.0,
+                "y": 1.5,
+                "z": -1.0
+            },
+            "size": 0.6000000238418579,
+            "type": "Sphère"
+        },
+        {
+            "color": {
+                "b": 1.0,
+                "g": 0.10000000149011612,
+                "r": 0.8999999761581421
+            },
+            "emission_strength": 9.024999618530273,
+            "material": "Néon",
+            "name": "Néon Violet",
+            "position": {
+                "x": 2.5,
+                "y": 1.2000000476837158,
+                "z": 0.5
+            },
+            "size": 0.550000011920929,
+            "type": "Sphère"
+        },
+        {
+            "color": {
+                "b": 1.0,
+                "g": 1.0,
+                "r": 1.0
+            },
+            "material": "Miroir",
+            "name": "Chrome Central",
+            "position": {
+                "x": 0.0,
+                "y": 0.800000011920929,
+                "z": 2.0
+            },
+            "size": 0.800000011920929,
+            "type": "Sphère"
+        },
+        {
+            "color": {
+                "b": 0.30000001192092896,
+                "g": 0.8500000238418579,
+                "r": 1.0
+            },
+            "material": "Miroir",
+            "name": "Chrome Or",
+            "position": {
+                "x": -1.5,
+                "y": 0.6000000238418579,
+                "z": 1.5
+            },
+            "size": 0.6000000238418579,
+            "type": "Sphère"
+        },
+        {
+            "color": {
+                "b": 0.800000011920929,
+                "g": 0.699999988079071,
+                "r": 0.699999988079071
+            },
+            "material": "Métal",
+            "name": "Métal Rugueux",
+            "position": {
+                "x": 1.7999999523162842,
+                "y": 0.5,
+                "z": 1.7999999523162842
+            },
+            "roughness": 0.30000001192092896,
+            "size": 0.5,
+            "type": "Sphère"
+        },
+        {
+            "color": {
+                "b": 1.0,
+                "g": 0.949999988079071,
+                "r": 0.8999999761581421
+            },
+            "material": "Verre",
+            "name": "Verre",
+            "position": {
+                "x": 0.800000011920929,
+                "y": 0.699999988079071,
+                "z": 0.20000000298023224
+            },
+            "refraction_index": 1.5,
+            "size": 0.699999988079071,
+            "type": "Sphère"
         }
-      }
+    ],
+    "render": {
+        "ambient_light": 0.15000000596046448,
+        "gamma": 2.200000047683716,
+        "image_height": 1080,
+        "image_width": 1920,
+        "max_depth": 75,
+        "num_threads": 8,
+        "samples_per_pixel": 400,
+        "sun_intensity": 1.0
     }
-  },
-  
-  "render_time_estimates": {
-    "actuel_cpu_8_threads": "~8 minutes (1920x1080, 500 samples)",
-    "avec_bvh": "~8 minutes (pas d'impact, peu d'objets)",
-    "avec_triangles_sans_bvh": "IMPOSSIBLE (heures)",
-    "avec_triangles_avec_bvh": "~15 minutes (70k triangles Bunny)",
-    "future_gpu": "~30 secondes (estimation)"
-  },
-  
-  "parametres_qualite": {
-    "preview": {
-      "resolution": "640x360",
-      "samples": 50,
-      "time": "~30 sec",
-      "usage": "Tester composition"
-    },
-    "normal": {
-      "resolution": "1920x1080",
-      "samples": 200,
-      "time": "~3 min",
-      "usage": "Développement"
-    },
-    "high": {
-      "resolution": "1920x1080",
-      "samples": 500,
-      "time": "~8 min",
-      "usage": "Rendu final"
-    },
-    "ultra": {
-      "resolution": "3840x2160",
-      "samples": 1000,
-      "time": "~45 min",
-      "usage": "Portfolio"
-    }
-  }
 }

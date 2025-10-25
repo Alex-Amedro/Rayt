@@ -230,10 +230,10 @@ void EditorUI::render_properties() {
         // ====================================================================
         ImGui::Text("Matériau");
         
-        const char* materials[] = { "Diffus", "Métal", "Verre" };
+        const char* materials[] = { "Diffus", "Métal", "Verre", "Néon", "Miroir" };
         int current_material = (int)obj->material;
         
-        if (ImGui::Combo("Type", &current_material, materials, 3)) {
+        if (ImGui::Combo("Type", &current_material, materials, 5)) {
             obj->material = (MaterialType)current_material;
         }
         
@@ -242,6 +242,9 @@ void EditorUI::render_properties() {
             ImGui::SliderFloat("Rugosité", &obj->roughness, 0.0f, 1.0f);
         } else if (obj->material == MaterialType::DIELECTRIC) {
             ImGui::SliderFloat("Indice de réfraction", &obj->refraction_index, 1.0f, 2.5f);
+        } else if (obj->material == MaterialType::EMISSIVE) {
+            ImGui::SliderFloat("Intensité lumineuse", &obj->emission_strength, 1.0f, 20.0f);
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Astuce: 5.0 = néon, 10.0+ = très brillant");
         }
     }
 }
@@ -320,6 +323,8 @@ void EditorUI::render_actions() {
             ImGui::Spacing();
             ImGui::Text("Environnement");
             ImGui::SliderFloat("Sun Intensity", &sun_intensity, 0.0f, 2.0f);
+            ImGui::SliderFloat("Ambient Light", &ambient_light, 0.0f, 1.0f);
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "0.0 = noir complet, 1.0 = ciel complet");
             
             ImGui::Spacing();
             ImGui::Text("Post-Processing");
@@ -361,6 +366,7 @@ void EditorUI::render_actions() {
                 scene_data["render"]["samples_per_pixel"] = samples_per_pixel;
                 scene_data["render"]["max_depth"] = max_depth;
                 scene_data["render"]["sun_intensity"] = sun_intensity;
+                scene_data["render"]["ambient_light"] = ambient_light;
                 scene_data["render"]["gamma"] = gamma;
                 scene_data["render"]["num_threads"] = num_threads;
 
@@ -387,6 +393,8 @@ void EditorUI::render_actions() {
                         obj_data["roughness"] = obj->roughness;
                     } else if (obj->material == MaterialType::DIELECTRIC) {
                         obj_data["refraction_index"] = obj->refraction_index;
+                    } else if (obj->material == MaterialType::EMISSIVE) {
+                        obj_data["emission_strength"] = obj->emission_strength;
                     }
                     scene_data["objects"].push_back(obj_data);
                 }
@@ -403,7 +411,7 @@ void EditorUI::render_actions() {
         
         // Bouton Load
         if (ImGui::Button("Load", ImVec2(-1, 0))) {
-            std::string load_path = "../c++/src/data/save/save1.json";
+            std::string load_path = "../c++/src/data/save/neon_showcase.json";
             scene.load_from_json(load_path);
             
             // Load render settings from JSON
@@ -422,6 +430,8 @@ void EditorUI::render_actions() {
                         max_depth = scene_data["render"]["max_depth"];
                     if (scene_data["render"].contains("sun_intensity"))
                         sun_intensity = scene_data["render"]["sun_intensity"];
+                    if (scene_data["render"].contains("ambient_light"))
+                        ambient_light = scene_data["render"]["ambient_light"];
                     if (scene_data["render"].contains("gamma"))
                         gamma = scene_data["render"]["gamma"];
                     if (scene_data["render"].contains("num_threads"))
@@ -468,6 +478,7 @@ void EditorUI::render_actions() {
                 scene_data["render"]["samples_per_pixel"] = samples_per_pixel;
                 scene_data["render"]["max_depth"] = max_depth;
                 scene_data["render"]["sun_intensity"] = sun_intensity;
+                scene_data["render"]["ambient_light"] = ambient_light;
                 scene_data["render"]["gamma"] = gamma;
                 scene_data["render"]["num_threads"] = num_threads;
 
@@ -492,20 +503,19 @@ void EditorUI::render_actions() {
                         obj_data["roughness"] = obj->roughness;
                     } else if (obj->material == MaterialType::DIELECTRIC) {
                         obj_data["refraction_index"] = obj->refraction_index;
+                    } else if (obj->material == MaterialType::EMISSIVE) {
+                        obj_data["emission_strength"] = obj->emission_strength;
                     }
                     scene_data["objects"].push_back(obj_data);
                 }
 
-                std::string save_path = "../c++/src/data/save/save1.json";
+                std::string save_path = "../c++/src/data/save/demo_scene.json";
                 std::ofstream ofs(save_path);
                 ofs << scene_data.dump(4);
                 ofs.close();
 
                 //lancer le render
-                int ret = system("make run");
-                if (ret != 0) {
-                    std::cerr << "Erreur lors du lancement du raytracer (code: " << ret << ")\n";
-                }
+                system("make run");
 
             } catch (const std::exception& e) {
                 std::cerr << "Erreur lors de la sauvegarde de la scène : " << e.what() << std::endl;

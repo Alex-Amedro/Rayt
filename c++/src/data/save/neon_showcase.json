@@ -1,0 +1,104 @@
+{
+    "camera": {
+        "aperture": 0.0,
+        "aspect_ratio": 1.777777777777777,
+        "focus_distance": 10.0,
+        "fov": 45.0,
+        "look_at": {
+            "x": 0.0,
+            "y": 1.5,
+            "z": 0.0
+        },
+        "origin": {
+            "x": 0.0,
+            "y": 2.5,
+            "z": 8.0
+        },
+        "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+        }
+    },
+    "render": {
+        "image_width": 800,
+        "image_height": 450,
+        "samples_per_pixel": 100,
+        "max_depth": 10,
+        "sun_intensity": 1.0,
+        "ambient_light": 0.15,
+        "gamma": 2.2,
+        "num_threads": 8
+    },
+    "objects": [
+        {
+            "type": "Plan",
+            "name": "Sol Miroir",
+            "position": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "color": {"r": 0.95, "g": 0.95, "b": 0.95},
+            "size": 20.0,
+            "material": "Miroir"
+        },
+        {
+            "type": "Sphère",
+            "name": "Néon Rouge",
+            "position": {"x": -2.5, "y": 1.0, "z": 0.0},
+            "color": {"r": 1.0, "g": 0.05, "b": 0.05},
+            "size": 0.5,
+            "material": "Néon",
+            "emission_strength": 8.0
+        },
+        {
+            "type": "Sphère",
+            "name": "Néon Cyan",
+            "position": {"x": 0.0, "y": 1.5, "z": -1.0},
+            "color": {"r": 0.05, "g": 0.8, "b": 1.0},
+            "size": 0.6,
+            "material": "Néon",
+            "emission_strength": 10.0
+        },
+        {
+            "type": "Sphère",
+            "name": "Néon Violet",
+            "position": {"x": 2.5, "y": 1.2, "z": 0.5},
+            "color": {"r": 0.9, "g": 0.1, "b": 1.0},
+            "size": 0.55,
+            "material": "Néon",
+            "emission_strength": 7.0
+        },
+        {
+            "type": "Sphère",
+            "name": "Chrome Central",
+            "position": {"x": 0.0, "y": 0.8, "z": 2.0},
+            "color": {"r": 1.0, "g": 1.0, "b": 1.0},
+            "size": 0.8,
+            "material": "Miroir"
+        },
+        {
+            "type": "Sphère",
+            "name": "Chrome Or",
+            "position": {"x": -1.5, "y": 0.6, "z": 1.5},
+            "color": {"r": 1.0, "g": 0.85, "b": 0.3},
+            "size": 0.6,
+            "material": "Miroir"
+        },
+        {
+            "type": "Sphère",
+            "name": "Métal Rugueux",
+            "position": {"x": 1.8, "y": 0.5, "z": 1.8},
+            "color": {"r": 0.7, "g": 0.7, "b": 0.8},
+            "size": 0.5,
+            "material": "Métal",
+            "roughness": 0.3
+        },
+        {
+            "type": "Sphère",
+            "name": "Verre",
+            "position": {"x": 0.8, "y": 0.7, "z": 0.2},
+            "color": {"r": 0.9, "g": 0.95, "b": 1.0},
+            "size": 0.7,
+            "material": "Verre",
+            "refraction_index": 1.5
+        }
+    ]
+}

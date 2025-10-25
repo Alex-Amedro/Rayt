@@ -51,6 +51,10 @@ vec3 vec3::operator*(vec3 mul) const {
     return vec3(this->x * mul.x, this->y * mul.y, this->z * mul.z);
 }
 
+vec3 vec3::operator+(double constant) const {
+    return vec3(this->x + constant, this->y + constant, this->z + constant);
+}
+
 // Random vector utilities
 vec3 random_in_unit_sphere() {
     static std::random_device rd;
@@ -72,3 +76,4 @@ vec3 random_unit_vector() {
 vec3 reflect(const vec3& v_in, const vec3& normal) {
     return v_in - (normal * (2.0 * v_in.dot(normal)));
 }
+
