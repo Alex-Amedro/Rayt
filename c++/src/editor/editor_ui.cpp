@@ -3,14 +3,21 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <iostream>
+#include "../../external/nlohmann/json.hpp"
+#include <fstream>
+#include <filesystem>
+
+
+using json = nlohmann::json;
 
 // ============================================================================
 // CONSTRUCTEUR
 // ============================================================================
 
-EditorUI::EditorUI(Scene& s)
+EditorUI::EditorUI(Scene& s, CameraGL& cam)
     : scene(s)
     , gizmo(nullptr)
+    , camera(cam)
     , show_add_menu(true)
     , show_properties(true)
 {
@@ -35,8 +42,6 @@ void EditorUI::init(GLFWwindow* window) {
     // (incluant le clavier pour les zones de texte)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
-    
-    std::cout << "ImGui initialisé\n";
 }
 
 // ============================================================================
@@ -47,7 +52,6 @@ void EditorUI::shutdown() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    std::cout << "ImGui nettoyé\n";
 }
 
 // ============================================================================
@@ -176,7 +180,8 @@ void EditorUI::render_properties() {
         // NOM DE L'OBJET
         // ====================================================================
         static char buffer[128] = "";
-        strncpy(buffer, obj->name.c_str(), sizeof(buffer));
+        strncpy(buffer, obj->name.c_str(), sizeof(buffer) - 1);
+        buffer[sizeof(buffer) - 1] = '\0';  // Garantir la terminaison
         if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
             obj->name = buffer;
         }
@@ -277,10 +282,234 @@ void EditorUI::render_actions() {
         
         ImGui::Spacing();
         
+        // ====================================================================
+        // IMAGE SETTINGS (Paramètres pour le raytracer)
+        // ====================================================================
+        if (ImGui::CollapsingHeader("Image Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+            ImGui::Text("Résolution");
+            
+            // ComboBox pour les presets de résolution
+            const char* resolution_presets[] = { "480p (854x480)", "720p (1280x720)", "1080p (1920x1080)", "2K (2560x1440)", "4K (3840x2160)" };
+            static int current_preset = 2; // Par défaut 1080p
+            
+            if (ImGui::Combo("Preset", &current_preset, resolution_presets, IM_ARRAYSIZE(resolution_presets))) {
+                // Appliquer le preset sélectionné
+                switch (current_preset) {
+                    case 0: image_width = 854;  image_height = 480;  break;  // 480p
+                    case 1: image_width = 1280; image_height = 720;  break;  // 720p
+                    case 2: image_width = 1920; image_height = 1080; break;  // 1080p
+                    case 3: image_width = 2560; image_height = 1440; break;  // 2K
+                    case 4: image_width = 3840; image_height = 2160; break;  // 4K
+                }
+            }
+            
+            // Ou entrée manuelle
+            ImGui::InputInt("Width", &image_width);
+            ImGui::InputInt("Height", &image_height);
+            
+            ImGui::Spacing();
+            ImGui::Text("Qualité de rendu");
+            ImGui::InputInt("Samples per Pixel", &samples_per_pixel);
+            ImGui::InputInt("Max Depth", &max_depth);
+            
+            ImGui::Spacing();
+            ImGui::Text("Profondeur de champ");
+            ImGui::SliderFloat("Aperture", &aperture, 0.0f, 2.0f);
+            ImGui::SliderFloat("Focus Distance", &focus_distance, 1.0f, 100.0f);
+            
+            ImGui::Spacing();
+            ImGui::Text("Environnement");
+            ImGui::SliderFloat("Sun Intensity", &sun_intensity, 0.0f, 2.0f);
+            
+            ImGui::Spacing();
+            ImGui::Text("Post-Processing");
+            ImGui::SliderFloat("Gamma", &gamma, 1.0f, 3.0f);
+            
+            ImGui::Spacing();
+            ImGui::Text("Performance");
+            ImGui::InputInt("Threads", &num_threads);
+        }
+        
+        ImGui::Spacing();
+
+        if (ImGui::Button("Save", ImVec2(-1, 0))) {
+            try {
+                std::cout << "[SAVE] Début de la sauvegarde de la scène...\n";
+                json scene_data;
+                
+                // Camera data - utiliser les vrais paramètres de la caméra
+                glm::vec3 cam_pos = camera.get_position();
+                glm::vec3 cam_target = camera.get_target();
+                
+                scene_data["camera"]["origin"]["x"] = cam_pos.x;
+                scene_data["camera"]["origin"]["y"] = cam_pos.y;
+                scene_data["camera"]["origin"]["z"] = cam_pos.z;
+                scene_data["camera"]["look_at"]["x"] = cam_target.x;
+                scene_data["camera"]["look_at"]["y"] = cam_target.y;
+                scene_data["camera"]["look_at"]["z"] = cam_target.z;
+                scene_data["camera"]["up"]["x"] = 0.0f;
+                scene_data["camera"]["up"]["y"] = 1.0f;
+                scene_data["camera"]["up"]["z"] = 0.0f;
+                scene_data["camera"]["fov"] = camera.get_fov();
+                scene_data["camera"]["aspect_ratio"] = static_cast<double>(image_width) / static_cast<double>(image_height);
+                scene_data["camera"]["aperture"] = aperture;
+                scene_data["camera"]["focus_distance"] = focus_distance;
+
+                // Render settings
+                scene_data["render"]["image_width"] = image_width;
+                scene_data["render"]["image_height"] = image_height;
+                scene_data["render"]["samples_per_pixel"] = samples_per_pixel;
+                scene_data["render"]["max_depth"] = max_depth;
+                scene_data["render"]["sun_intensity"] = sun_intensity;
+                scene_data["render"]["gamma"] = gamma;
+                scene_data["render"]["num_threads"] = num_threads;
+
+                //scene_data["environment"]["background"] = background_color;
+                //scene_data["environment"]["hour"] = hour;
+
+
+
+                scene_data["objects"] = json::array();
+                for (int i = 0; i < scene.get_object_count(); i++) {
+                    SceneObject* obj = scene.get_object(i);
+                    json obj_data;
+                    obj_data["type"] = obj->get_type_name();
+                    obj_data["name"] = obj->name;
+                    obj_data["position"]["x"] = obj->position.x;
+                    obj_data["position"]["y"] = obj->position.y;
+                    obj_data["position"]["z"] = obj->position.z;
+                    obj_data["color"]["r"] = obj->color.r;
+                    obj_data["color"]["g"] = obj->color.g;
+                    obj_data["color"]["b"] = obj->color.b;
+                    obj_data["size"] = obj->size;
+                    obj_data["material"] = obj->get_material_name();
+                    if (obj->material == MaterialType::METAL) {
+                        obj_data["roughness"] = obj->roughness;
+                    } else if (obj->material == MaterialType::DIELECTRIC) {
+                        obj_data["refraction_index"] = obj->refraction_index;
+                    }
+                    scene_data["objects"].push_back(obj_data);
+                }
+
+                std::string save_path = "../c++/src/data/save/save1.json";
+                std::ofstream ofs(save_path);
+                ofs << scene_data.dump(4);
+                ofs.close();
+               
+            } catch (const std::exception& e) {
+                std::cerr << "[SAVE] ✗ Erreur lors de la sauvegarde : " << e.what() << std::endl;
+            }
+        }
+        
+        // Bouton Load
+        if (ImGui::Button("Load", ImVec2(-1, 0))) {
+            std::string load_path = "../c++/src/data/save/save1.json";
+            scene.load_from_json(load_path);
+            
+            // Load render settings from JSON
+            try {
+                std::ifstream ifs(load_path);
+                json scene_data = json::parse(ifs);
+                
+                if (scene_data.contains("render")) {
+                    if (scene_data["render"].contains("image_width"))
+                        image_width = scene_data["render"]["image_width"];
+                    if (scene_data["render"].contains("image_height"))
+                        image_height = scene_data["render"]["image_height"];
+                    if (scene_data["render"].contains("samples_per_pixel"))
+                        samples_per_pixel = scene_data["render"]["samples_per_pixel"];
+                    if (scene_data["render"].contains("max_depth"))
+                        max_depth = scene_data["render"]["max_depth"];
+                    if (scene_data["render"].contains("sun_intensity"))
+                        sun_intensity = scene_data["render"]["sun_intensity"];
+                    if (scene_data["render"].contains("gamma"))
+                        gamma = scene_data["render"]["gamma"];
+                    if (scene_data["render"].contains("num_threads"))
+                        num_threads = scene_data["render"]["num_threads"];
+                }
+                
+                if (scene_data["camera"].contains("aperture"))
+                    aperture = scene_data["camera"]["aperture"];
+                if (scene_data["camera"].contains("focus_distance"))
+                    focus_distance = scene_data["camera"]["focus_distance"];
+            } catch (const std::exception& e) {
+                std::cerr << "[LOAD] Erreur lors du chargement des render settings : " << e.what() << std::endl;
+            }
+        }
+        
+        ImGui::Spacing();
+        
         // Bouton Render
         if (ImGui::Button("Lancer le Ray Tracer", ImVec2(-1, 0))) {
-            std::cout << "TODO : Lancer le ray tracer\n";
-            // TODO : Exporter la scène et lancer le ray tracer C++
+            try {
+                json scene_data;
+                
+                // Camera data - utiliser les vrais paramètres de la caméra
+                glm::vec3 cam_pos = camera.get_position();
+                glm::vec3 cam_target = camera.get_target();
+                
+                scene_data["camera"]["origin"]["x"] = cam_pos.x;
+                scene_data["camera"]["origin"]["y"] = cam_pos.y;
+                scene_data["camera"]["origin"]["z"] = cam_pos.z;
+                scene_data["camera"]["look_at"]["x"] = cam_target.x;
+                scene_data["camera"]["look_at"]["y"] = cam_target.y;
+                scene_data["camera"]["look_at"]["z"] = cam_target.z;
+                scene_data["camera"]["up"]["x"] = 0.0f;
+                scene_data["camera"]["up"]["y"] = 1.0f;
+                scene_data["camera"]["up"]["z"] = 0.0f;
+                scene_data["camera"]["fov"] = camera.get_fov();
+                scene_data["camera"]["aspect_ratio"] = static_cast<double>(image_width) / static_cast<double>(image_height);
+                scene_data["camera"]["aperture"] = aperture;
+                scene_data["camera"]["focus_distance"] = focus_distance;
+
+                // Render settings
+                scene_data["render"]["image_width"] = image_width;
+                scene_data["render"]["image_height"] = image_height;
+                scene_data["render"]["samples_per_pixel"] = samples_per_pixel;
+                scene_data["render"]["max_depth"] = max_depth;
+                scene_data["render"]["sun_intensity"] = sun_intensity;
+                scene_data["render"]["gamma"] = gamma;
+                scene_data["render"]["num_threads"] = num_threads;
+
+                //scene_data["environment"]["background"] = background_color;
+                //scene_data["environment"]["hour"] = hour;
+
+                scene_data["objects"] = json::array();
+                for (int i = 0; i < scene.get_object_count(); i++) {
+                    SceneObject* obj = scene.get_object(i);
+                    json obj_data;
+                    obj_data["type"] = obj->get_type_name();
+                    obj_data["name"] = obj->name;
+                    obj_data["position"]["x"] = obj->position.x;
+                    obj_data["position"]["y"] = obj->position.y;
+                    obj_data["position"]["z"] = obj->position.z;
+                    obj_data["color"]["r"] = obj->color.r;
+                    obj_data["color"]["g"] = obj->color.g;
+                    obj_data["color"]["b"] = obj->color.b;
+                    obj_data["size"] = obj->size;
+                    obj_data["material"] = obj->get_material_name();
+                    if (obj->material == MaterialType::METAL) {
+                        obj_data["roughness"] = obj->roughness;
+                    } else if (obj->material == MaterialType::DIELECTRIC) {
+                        obj_data["refraction_index"] = obj->refraction_index;
+                    }
+                    scene_data["objects"].push_back(obj_data);
+                }
+
+                std::string save_path = "../c++/src/data/save/save1.json";
+                std::ofstream ofs(save_path);
+                ofs << scene_data.dump(4);
+                ofs.close();
+
+                //lancer le render
+                int ret = system("make run");
+                if (ret != 0) {
+                    std::cerr << "Erreur lors du lancement du raytracer (code: " << ret << ")\n";
+                }
+
+            } catch (const std::exception& e) {
+                std::cerr << "Erreur lors de la sauvegarde de la scène : " << e.what() << std::endl;
+        }   
         }
     }
 }

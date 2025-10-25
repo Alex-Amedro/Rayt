@@ -9,15 +9,15 @@ Grid::Grid(float size, int divisions)
     // Générer les lignes parallèles à l'axe X
     for (int i = 0; i <= divisions; ++i) {
         float z = -half + i * step;
-        vertices.push_back(glm::vec3(-half, 0.0f, z));
-        vertices.push_back(glm::vec3(half, 0.0f, z));
+        vertices.push_back(glm::vec3(-half, -0.01f, z));  // Légèrement en dessous de y=0
+        vertices.push_back(glm::vec3(half, -0.01f, z));
     }
     
     // Générer les lignes parallèles à l'axe Z
     for (int i = 0; i <= divisions; ++i) {
         float x = -half + i * step;
-        vertices.push_back(glm::vec3(x, 0.0f, -half));
-        vertices.push_back(glm::vec3(x, 0.0f, half));
+        vertices.push_back(glm::vec3(x, -0.01f, -half));
+        vertices.push_back(glm::vec3(x, -0.01f, half));
     }
     
     // Configurer les buffers OpenGL

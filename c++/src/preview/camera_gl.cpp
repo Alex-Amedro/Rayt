@@ -19,13 +19,7 @@ CameraGL::CameraGL(
 ) : position(pos), target(target_pos), up(up_dir), fov(fov_deg),
     aspect_ratio(aspect), near_plane(near_z), far_plane(far_z) {
     
-    std::cout << "[LEÇON 4] Création de la caméra OpenGL..." << std::endl;
-    std::cout << "  Position: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
-    std::cout << "  FOV: " << fov_deg << "°" << std::endl;
-    
     update_matrices();
-    
-    std::cout << "  ✓ Caméra prête !" << std::endl << std::endl;
 }
 
 // ============================================================================
@@ -35,9 +29,7 @@ void CameraGL::update_matrices() {
     // ========================================================================
     // VIEW MATRIX
     // ========================================================================
-    // Dit à OpenGL où on regarde et comment
-    // glm::lookAt(position, target, up) = matrice de vue standard
-    //
+
     view_matrix = glm::lookAt(
         position,              // Où on est
         target,                // Où on regarde
@@ -47,14 +39,7 @@ void CameraGL::update_matrices() {
     // ========================================================================
     // PROJECTION MATRIX
     // ========================================================================
-    // Dit à OpenGL comment transformer l'espace 3D en espace 2D écran
-    // glm::perspective(fov, aspect, near, far) = projection en perspective
-    //
-    // fov = angle de vision vertical en radians
-    // aspect = largeur / hauteur
-    // near = plan proche (ce qui est plus proche est coupé)
-    // far = plan lointain (ce qui est plus loin est coupé)
-    //
+
     projection_matrix = glm::perspective(
         glm::radians(fov),       // Convertir FOV en radians
         aspect_ratio,            // Ratio largeur/hauteur
@@ -90,3 +75,4 @@ void CameraGL::set_aspect_ratio(float new_aspect) {
     aspect_ratio = new_aspect;
     update_matrices();
 }
+

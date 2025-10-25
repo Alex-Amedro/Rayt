@@ -25,6 +25,7 @@
 
 #include "scene.hpp"
 #include "gizmo.hpp"
+#include "preview/camera_gl.hpp"
 #include <GLFW/glfw3.h>
 
 // ============================================================================
@@ -35,6 +36,7 @@ class EditorUI {
 private:
     Scene& scene;  // Référence à la scène (pour ajouter/modifier des objets)
     Gizmo* gizmo;  // Référence au gizmo (pour mettre à jour sa position)
+    CameraGL& camera;  // Référence à la caméra (pour la sauvegarde)
     
     // ====================================================================
     // ÉTAT DE L'INTERFACE
@@ -42,11 +44,31 @@ private:
     bool show_add_menu;      // Menu "Ajouter un objet" visible ?
     bool show_properties;    // Panneau de propriétés visible ?
     
+    // ====================================================================
+    // RENDER SETTINGS (pour le raytracer)
+    // ====================================================================
+    // Image quality
+    int image_width = 1920;
+    int image_height = 1080;
+    int samples_per_pixel = 200;  // Augmenté pour réduire le bruit
+    int max_depth = 50;
+    
+    // Camera
+    float aperture = 0.0f;
+    float focus_distance = 10.0f;
+    
+    // Environment
+    float sun_intensity = 1.0f;
+    float gamma = 2.2f;
+    
+    // Performance
+    int num_threads = 8;
+    
 public:
     // ====================================================================
     // CONSTRUCTEUR
     // ====================================================================
-    EditorUI(Scene& s);
+    EditorUI(Scene& s, CameraGL& cam);
     
     // ====================================================================
     // SETTER

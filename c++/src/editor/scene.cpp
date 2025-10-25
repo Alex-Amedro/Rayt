@@ -10,6 +10,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <limits>
+#include "../../external/nlohmann/json.hpp"
+#include <fstream>
+
+using json = nlohmann::json;
 
 // ============================================================================
 // CONSTRUCTEUR
@@ -36,11 +40,9 @@ Scene::~Scene() {
 
 void Scene::add_object(SceneObject* obj) {
     if (obj == nullptr) {
-        std::cerr << "Erreur : tentative d'ajout d'un objet nullptr\n";
         return;
     }
     objects.push_back(obj);
-    std::cout << "Objet ajouté : " << obj->name << " (" << obj->get_type_name() << ")\n";
 }
 
 // ============================================================================
@@ -49,11 +51,8 @@ void Scene::add_object(SceneObject* obj) {
 
 void Scene::remove_object(int index) {
     if (index < 0 || index >= (int)objects.size()) {
-        std::cerr << "Erreur : index invalide (" << index << ")\n";
         return;
     }
-    
-    std::cout << "Suppression de : " << objects[index]->name << "\n";
     
     // Libérer la mémoire
     delete objects[index];
@@ -197,7 +196,6 @@ void Scene::clear() {
     }
     objects.clear();
     selected_index = -1;
-    std::cout << "Scène vidée\n";
 }
 
 // ============================================================================
@@ -227,8 +225,6 @@ void Scene::create_default_scene() {
     sphere3->color = glm::vec3(0.0f, 0.0f, 1.0f);  // Bleu
     sphere3->size = 0.8f;
     add_object(sphere3);
-    
-    std::cout << "Scène par défaut créée (3 sphères)\n";
 }
 
 int Scene::pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction) {
@@ -254,4 +250,81 @@ int Scene::pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction) {
     }
     
     return closest_index;
+}
+
+// ============================================================================
+// LOAD_FROM_JSON : Charger une scène depuis un fichier JSON
+// ============================================================================
+void Scene::load_from_json(const std::string& filepath) {
+    try {
+        std::cout << "[LOAD] Début du chargement de la scène depuis " << filepath << "\n";
+        
+        std::ifstream ifs(filepath);
+        if (!ifs.is_open()) {
+            std::cerr << "[LOAD] ✗ Impossible d'ouvrir le fichier : " << filepath << "\n";
+            return;
+        }
+        
+        json scene_data;
+        ifs >> scene_data;
+        ifs.close();
+        
+        // Vider la scène actuelle
+        clear();
+        
+        // Charger les objets
+        if (scene_data.contains("objects") && scene_data["objects"].is_array()) {
+            for (const auto& obj_data : scene_data["objects"]) {
+                std::string type = obj_data["type"];
+                std::string name = obj_data["name"];
+                
+                ObjectType obj_type = (type == "Sphère") ? ObjectType::SPHERE : ObjectType::PLANE;
+                SceneObject* obj = new SceneObject(obj_type, name);
+                
+                // Position
+                if (obj_data.contains("position")) {
+                    obj->position.x = obj_data["position"]["x"];
+                    obj->position.y = obj_data["position"]["y"];
+                    obj->position.z = obj_data["position"]["z"];
+                }
+                
+                // Couleur
+                if (obj_data.contains("color")) {
+                    obj->color.r = obj_data["color"]["r"];
+                    obj->color.g = obj_data["color"]["g"];
+                    obj->color.b = obj_data["color"]["b"];
+                }
+                
+                // Taille
+                if (obj_data.contains("size")) {
+                    obj->size = obj_data["size"];
+                }
+                
+                // Matériau
+                if (obj_data.contains("material")) {
+                    std::string material_name = obj_data["material"];
+                    if (material_name == "Métal") {
+                        obj->material = MaterialType::METAL;
+                        if (obj_data.contains("roughness")) {
+                            obj->roughness = obj_data["roughness"];
+                        }
+                    } else if (material_name == "Verre") {
+                        obj->material = MaterialType::DIELECTRIC;
+                        if (obj_data.contains("refraction_index")) {
+                            obj->refraction_index = obj_data["refraction_index"];
+                        }
+                    } else {
+                        obj->material = MaterialType::DIFFUSE;
+                    }
+                }
+                
+                add_object(obj);
+            }
+        }
+        
+        std::cout << "[LOAD] ✓ Scène chargée avec " << objects.size() << " objets\n";
+        
+    } catch (const std::exception& e) {
+        std::cerr << "[LOAD] ✗ Erreur lors du chargement : " << e.what() << "\n";
+    }
 }

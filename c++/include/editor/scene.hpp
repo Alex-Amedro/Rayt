@@ -134,4 +134,9 @@ public:
 
     // Récupérer l'index de l'objet intersecté par un rayon
     int pick_object(glm::vec3 ray_origin, glm::vec3 ray_direction);
+    
+    // ====================================================================
+    // SAUVEGARDE / CHARGEMENT (JSON)
+    // ====================================================================
+    void load_from_json(const std::string& filepath);
 };

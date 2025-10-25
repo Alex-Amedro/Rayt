@@ -41,9 +41,6 @@ int Gizmo::pick_axis(glm::vec3 ray_origin, glm::vec3 ray_direction) {
         glm::vec3(0, 0, 1)   // Z
     };
     
-    std::cout << "[GIZMO] Test pick_axis à position: (" 
-              << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
-    
     // Tester l'intersection avec chaque axe
     for (int i = 0; i < 3; i++) {
         glm::vec3 axis_start = position;
@@ -51,23 +48,12 @@ int Gizmo::pick_axis(glm::vec3 ray_origin, glm::vec3 ray_direction) {
         
         float distance, t_hit;
         if (ray_line_distance(ray_origin, ray_direction, axis_start, axis_end, distance, t_hit)) {
-            std::cout << "  Axe " << i << ": distance=" << distance 
-                      << ", t_hit=" << t_hit 
-                      << ", radius+tolerance=" << (axis_radius + 0.5f) << std::endl;
-            
             if (distance < closest_distance && t_hit > 0 && t_hit < closest_t) {
                 closest_distance = distance;
                 closest_axis = i;
                 closest_t = t_hit;
             }
         }
-    }
-    
-    if (closest_axis != -1) {
-        std::cout << "  → AXE SÉLECTIONNÉ: " << closest_axis 
-                  << " (distance=" << closest_distance << ")" << std::endl;
-    } else {
-        std::cout << "  → Aucun axe sélectionné" << std::endl;
     }
     
     selected_axis = closest_axis;

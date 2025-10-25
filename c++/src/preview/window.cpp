@@ -16,19 +16,10 @@
 Window::Window(int w, int h, const std::string& t) 
     : window(nullptr), width(w), height(h), title(t) {
     
-    std::cout << "\n[LEÇON 1] Création de la fenêtre..." << std::endl;
-    
-    // ========================================================================
-    // ÉTAPE 1 : Initialiser GLFW
-    // ========================================================================
-    // GLFW = "Graphics Library Framework"
-    // C'est la librairie qui crée les fenêtres et gère les événements
-    //
     if (!glfwInit()) {
         std::cerr << "ERREUR : GLFW n'a pas pu s'initialiser !" << std::endl;
         exit(1);
     }
-    std::cout << "✓ GLFW initialisé" << std::endl;
     
     // ========================================================================
     // ÉTAPE 2 : Configurer GLFW
@@ -46,13 +37,6 @@ Window::Window(int w, int h, const std::string& t)
     // vs "compatibility profile" (toutes les old features aussi)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    std::cout << "✓ GLFW configuré (OpenGL 4.6 Core)" << std::endl;
-    
-    // ========================================================================
-    // ÉTAPE 3 : Créer la fenêtre
-    // ========================================================================
-    // glfwCreateWindow(largeur, hauteur, titre, fullscreen?, shared?)
-    //
     window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     
     if (!window) {
@@ -60,17 +44,8 @@ Window::Window(int w, int h, const std::string& t)
         glfwTerminate();
         exit(1);
     }
-    std::cout << "✓ Fenêtre créée (" << width << "x" << height << ")" << std::endl;
     
-    // ========================================================================
-    // ÉTAPE 4 : Activer le contexte OpenGL
-    // ========================================================================
-    // Maintenant on dit à OpenGL : "dessine dans cette fenêtre"
-    // Un contexte = "l'espace où on dessine"
-    //
     glfwMakeContextCurrent(window);
-    
-    std::cout << "✓ Contexte OpenGL activé" << std::endl;
     
     // ========================================================================
     // ÉTAPE 5 : Initialiser GLEW
@@ -107,16 +82,12 @@ Window::Window(int w, int h, const std::string& t)
     
     // Faire passer les évènements (clicks, clavier) à la fenêtre
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    
-    std::cout << "\n✓ Fenêtre prête à dessiner !" << std::endl << std::endl;
 }
 
 // ============================================================================
 // DESTRUCTEUR : Window::~Window()
 // ============================================================================
 Window::~Window() {
-    std::cout << "[LEÇON 1] Fermeture de la fenêtre..." << std::endl;
-    
     // Fermer la fenêtre
     if (window) {
         glfwDestroyWindow(window);

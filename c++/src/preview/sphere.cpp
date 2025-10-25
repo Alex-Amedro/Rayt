@@ -15,14 +15,7 @@ const float PI = 3.14159265359f;
 Sphere::Sphere(float r, int st, int se) 
     : radius(r), stacks(st), sectors(se), VAO(0), VBO(0), EBO(0) {
     
-    std::cout << "[LEÇON 5] Génération de la sphère..." << std::endl;
-    std::cout << "  Rayon: " << r << std::endl;
-    std::cout << "  Stacks: " << st << ", Sectors: " << se << std::endl;
-    
     generate_sphere();
-    
-    std::cout << "  ✓ Sphère créée (" << vertices.size() << " vertices, " 
-              << indices.size() / 3 << " triangles)" << std::endl << std::endl;
 }
 
 // ============================================================================

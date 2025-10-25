@@ -146,40 +146,22 @@ void ShaderManager::print_program_error(GLuint program) {
 // ============================================================================
 bool ShaderManager::load_shaders(const std::string& vertex_path,
                                  const std::string& fragment_path) {
-    std::cout << "\n[LEÇON 2] Chargement des shaders..." << std::endl;
-    
-    // ====================================================================
-    // ÉTAPE 1 : Lire les fichiers
-    // ====================================================================
     std::string vertex_source = read_shader_file(vertex_path);
     if (vertex_source.empty()) return false;
-    std::cout << "✓ Vertex shader lu" << std::endl;
     
     std::string fragment_source = read_shader_file(fragment_path);
     if (fragment_source.empty()) return false;
-    std::cout << "✓ Fragment shader lu" << std::endl;
     
-    // ====================================================================
-    // ÉTAPE 2 : Compiler les shaders
-    // ====================================================================
     GLuint vertex_id = compile_shader(vertex_source, GL_VERTEX_SHADER);
     if (vertex_id == 0) return false;
-    std::cout << "✓ Vertex shader compilé" << std::endl;
     
     GLuint fragment_id = compile_shader(fragment_source, GL_FRAGMENT_SHADER);
     if (fragment_id == 0) {
         glDeleteShader(vertex_id);
         return false;
     }
-    std::cout << "✓ Fragment shader compilé" << std::endl;
     
-    // ====================================================================
-    // ÉTAPE 3 : Linker les shaders
-    // ====================================================================
     if (!link_program(vertex_id, fragment_id)) return false;
-    std::cout << "✓ Shaders linkés en program" << std::endl;
-    
-    std::cout << "✓ Shaders chargés avec succès !" << std::endl << std::endl;
     
     return true;
 }

@@ -20,11 +20,6 @@
 // ============================================================================
 
 int main() {
-    std::cout << "\n";
-    std::cout << "============================================\n";
-    std::cout << "   ÉDITEUR DE SCÈNE - RAY TRACER\n";
-    std::cout << "============================================\n\n";
-    
     // ====================================================================
     // 1. CRÉER LA FENÊTRE OPENGL
     // ====================================================================
@@ -71,7 +66,7 @@ int main() {
     Scene scene;
     scene.create_default_scene();  // 3 sphères de test
     
-    EditorUI ui(scene);
+    EditorUI ui(scene, camera);
     
     // ====================================================================
     // 5.5. CRÉER LE GIZMO POUR LA TRANSFORMATION
@@ -164,10 +159,6 @@ int main() {
                     data->drag_start_gizmo = data->gizmo->get_position();  // Position fixe de référence
                     data->last_mouse_x = mouse_x;  // Sauvegarder position souris initiale
                     data->last_mouse_y = mouse_y;
-                    std::cout << "🎯 DRAG DÉMARRÉ sur axe " << axis << " depuis position ("
-                              << data->drag_start_pos.x << ", " 
-                              << data->drag_start_pos.y << ", " 
-                              << data->drag_start_pos.z << ")" << std::endl;
                     return;  // Ne pas tester les objets de la scène
                 }
             }
@@ -186,9 +177,6 @@ int main() {
         }
         // CLIC GAUCHE RELÂCHÉ = arrêter le drag du gizmo
         else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-            if (data->dragging_gizmo) {
-                std::cout << "🛑 DRAG TERMINÉ" << std::endl;
-            }
             data->dragging_gizmo = false;
             data->dragging_axis = -1;
         }
@@ -304,8 +292,6 @@ int main() {
         auto* data = static_cast<CallbackData*>(glfwGetWindowUserPointer(w));
         if (data && data->camera && width > 0 && height > 0) {
             data->camera->set_aspect_ratio((float)width / (float)height);
-            std::cout << "[RESIZE] Fenêtre redimensionnée : " << width << "x" << height 
-                      << " (aspect ratio = " << ((float)width / (float)height) << ")\n";
         }
     });
     
@@ -313,16 +299,6 @@ int main() {
     // 8. VARIABLES DE TEMPS (pour delta_time)
     // ====================================================================
     float last_frame = 0.0f;
-    
-    std::cout << "\n";
-    std::cout << "Contrôles :\n";
-    std::cout << "  - ZQSD / WASD : Déplacer la caméra\n";
-    std::cout << "  - ESPACE : Monter\n";
-    std::cout << "  - SHIFT : Descendre\n";
-    std::cout << "  - CLIC DROIT MAINTENU + SOURIS : Regarder autour\n";
-    std::cout << "  - MOLETTE : Zoom\n";
-    std::cout << "  - ESC : Quitter\n";
-    std::cout << "\n";
     
     // ====================================================================
     // 9. BOUCLE DE RENDU
@@ -385,6 +361,5 @@ int main() {
     // ====================================================================
     ui.shutdown();
     
-    std::cout << "\nÉditeur fermé proprement\n";
     return 0;
 }

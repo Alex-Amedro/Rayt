@@ -79,10 +79,10 @@ vec3 ray_color(
             
             vec3 color_from_scatter = ray_color(next_origin, scattered_direction, scene, depth - 1);
             
-            // Apply material attenuation (albedo in [0, 255] range)
-            double r = (attenuation.x / 255.0) * color_from_scatter.x;
-            double g = (attenuation.y / 255.0) * color_from_scatter.y;
-            double b = (attenuation.z / 255.0) * color_from_scatter.z;
+            // Apply material attenuation (albedo already in [0, 1] range)
+            double r = attenuation.x * color_from_scatter.x;
+            double g = attenuation.y * color_from_scatter.y;
+            double b = attenuation.z * color_from_scatter.z;
             
             return vec3(r, g, b);
         } else {
@@ -95,8 +95,9 @@ vec3 ray_color(
     vec3 unit_direction = ray_direction.normalize();
     double t_sky = 0.5 * (unit_direction.y + 1.0);
 
-    vec3 color_white(255.0, 255.0, 255.0);
-    vec3 color_blue(135.0, 206.0, 235.0);
+    // Sky colors in [0, 1] range
+    vec3 color_white(1.0, 1.0, 1.0);
+    vec3 color_blue(0.5, 0.7, 1.0);
 
     double r = (1.0 - t_sky) * color_white.x + t_sky * color_blue.x;
     double g = (1.0 - t_sky) * color_white.y + t_sky * color_blue.y;

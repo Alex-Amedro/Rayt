@@ -1,7 +1,124 @@
-# Ray Tracer Improvement Roadmap
-## Path to Photorealism
+# Ray Tracer - Status & Roadmap
+**Dernière mise à jour: 25 octobre 2025**
 
-### Current State Analysis
+---
+
+## ✅ **COMPLÉTÉ (Phase 1 - Fondations)**
+
+### 🎓 **Apprentissage (7 leçons)**
+- [x] **Leçon 1:** Gradient simple
+- [x] **Leçon 2:** Sphère avec intersection rayon
+- [x] **Leçon 3:** Normales et ombrage basique
+- [x] **Leçon 4:** Anti-aliasing
+- [x] **Leçon 5:** Matériaux diffus (Lambertian)
+- [x] **Leçon 6:** Matériaux métalliques
+- [x] **Leçon 7:** Matériaux diélectriques (verre)
+
+### 🏗️ **Infrastructure**
+- [x] Architecture propre (hittable, material, vec3)
+- [x] Path tracing complet
+- [x] Multiple objets (sphères + plans)
+- [x] Trois types de matériaux (Diffus, Métal, Verre)
+- [x] Gamma correction
+- [x] Anti-aliasing (samples multiples)
+
+### 🎨 **Éditeur de Scène 3D (OpenGL)**
+- [x] Visualisation temps réel OpenGL
+- [x] Caméra interactive (rotation, zoom, pan)
+- [x] Gizmo 3D pour manipulation objets
+- [x] UI ImGui complète
+- [x] Ajout/suppression objets
+- [x] Édition propriétés (couleur, matériau, taille)
+- [x] Wireframe + grille au sol
+- [x] Ray picking (sélection à la souris)
+- [x] Save/Load scènes (JSON)
+
+### ⚙️ **Paramètres de Rendu**
+- [x] Résolution configurable (presets 480p-4K)
+- [x] Samples per pixel (anti-aliasing)
+- [x] Max depth (rebonds)
+- [x] Gamma correction paramétrable
+- [x] Multi-threading (configurable)
+
+### 🐛 **Corrections Récentes**
+- [x] **Caméra:** Export correct position/target (pas vecteurs view_matrix)
+- [x] **Aspect ratio:** Calculé depuis image_width/height
+- [x] **Couleurs:** Normalisation [0,1] (plus [0,255])
+- [x] **Matériaux:** Noms français (Diffus/Métal/Verre)
+- [x] **JSON:** Structure correcte pour tous les paramètres
+- [x] **Grille:** Z-fighting corrigé (y=-0.01)
+- [x] **UI:** ComboBox résolution + InputInt pour valeurs précises
+
+---
+
+## 🚀 **PROCHAINES ÉTAPES (Voir ROADMAP_V2.md)**
+
+Le fichier `ROADMAP_V2.md` contient la roadmap complète pour atteindre un rendu photo-réaliste professionnel.
+
+**Top 5 priorités recommandées:**
+1. Lumières ponctuelles + ombres portées
+2. Matériaux émissifs (néons, lampes)
+3. Tone mapping ACES (couleurs cinéma)
+4. BVH (accélération 50×)
+5. Textures procédurales (checker, Perlin noise)
+
+---
+
+## 📊 **État Actuel du Projet**
+
+**Fonctionnalités:** ⭐⭐⭐⭐ (8/10)
+- Éditeur complet et fonctionnel
+- Ray tracing path tracing correct
+- 3 matériaux physiquement plausibles
+
+**Qualité visuelle:** ⭐⭐⭐ (6/10)
+- Bon pour scènes simples
+- Manque éclairage avancé
+- Pas de textures
+
+**Performance:** ⭐⭐ (4/10)
+- Multi-threading basique
+- Pas d'accélération spatiale
+- Lent pour scènes complexes
+
+**Workflow:** ⭐⭐⭐⭐⭐ (10/10)
+- Éditeur visuel excellent
+- Save/Load parfait
+- UI intuitive
+
+---
+
+## 🎯 **Objectif Final**
+
+**Vision:** Concurrent open-source de Blender Cycles
+- Rendu photo-réaliste
+- Temps réel avec GPU
+- Bibliothèque de matériaux
+- Import OBJ/GLTF
+- Animation support
+
+**ETA:** 2-3 mois de développement actif
+
+---
+
+## 📚 **Resources & Références**
+
+**Code actuel:**
+- `c++/main.cpp` - Ray tracer CPU
+- `c++/src/editor/` - Éditeur OpenGL/ImGui
+- `c++/include/materials/` - Matériaux physiques
+- `c++/include/core/` - Path tracing
+
+**Documentation:**
+- ROADMAP_V2.md - Roadmap détaillée complète
+- README.md - Guide utilisateur
+
+**Inspirations:**
+- Peter Shirley's "Ray Tracing in One Weekend"
+- PBRT (Physically Based Rendering Textbook)
+- Blender Cycles source code
+
+---
 
 **What's Good ✅**
 - Clean architecture with proper inheritance (hittable, material)

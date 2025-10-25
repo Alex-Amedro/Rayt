@@ -99,4 +99,5 @@ public:
     glm::vec3 get_position() const { return position; }
     glm::vec3 get_target() const { return target; }
     float get_fov() const { return fov; }
+    float get_aspect_ratio() const { return aspect_ratio; }
 };

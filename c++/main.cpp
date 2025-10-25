@@ -5,6 +5,12 @@
 #include <limits>    
 #include <algorithm> 
 #include <random>
+#include <cmath>
+#include <filesystem>
+#include "../external/nlohmann/json.hpp"
+
+
+using json = nlohmann::json;
 
 #include "core/vec3.hpp"
 #include "core/camera.hpp"
@@ -73,50 +79,95 @@ int main() {
     // Display menu
     display_menu();
     
-    // Get user input
-    int image_width = get_positive_input("Image width (pixels)", 800);
-    int image_height = get_positive_input("Image height (pixels)", 400);
-    int samples_per_pixel = get_positive_input("Samples per pixel (quality)", 200);
-    int max_depth = get_positive_input("Max ray depth (bounces)", 50);
-    
-    std::cout << "\n✓ Configuration accepted\n";
-    std::cout << "  Resolution: " << image_width << "x" << image_height << "\n";
-    std::cout << "  Samples: " << samples_per_pixel << " | Max depth: " << max_depth << "\n";
-    std::cout << "\nStarting render...\n\n";
-    
-    const double aspect_ratio = static_cast<double>(image_width) / image_height;
+    std::string scene_file = "src/data/save/save1.json";
+    std::ifstream ifs(scene_file);
 
-    // Materials setup
-    auto mat_ground = std::make_shared<diffuse>(vec3(128, 128, 128));     
-    auto mat_glass = std::make_shared<dielectric>(1.5, vec3(255,255,255)); // Glass sphere
-    auto mat_left = std::make_shared<diffuse>(vec3(255, 0, 0));            
-    auto mat_right = std::make_shared<metal>(vec3(200, 150, 50), 0.1);    
-    
-    // Materials for spheres behind glass
-    auto mat_behind_red = std::make_shared<diffuse>(vec3(255, 50, 50));        // Red diffuse
-    auto mat_behind_metal = std::make_shared<metal>(vec3(180, 180, 255), 0.0); // Shiny blue metal
-    auto mat_behind_rough = std::make_shared<metal>(vec3(100, 200, 100), 0.3); // Rough green metal
+    if (!ifs.is_open()) {
+        std::cerr << "Erreur: Impossible d'ouvrir le fichier " << scene_file << std::endl;
+        std::cerr << "Veuillez créer une scène avec l'éditeur et sauvegarder avant de lancer le raytracer.\n";
+        return 1;
+    }
+    json scene_data;
+    try {
+        
+        ifs >> scene_data;
+    } catch (json::parse_error& e) {
+        std::cerr << "Erreur de parsing JSON: " << e.what() << std::endl;
+        ifs.close(); 
+        return 1; 
+    }
 
-    // Scene objects
-    std::vector<std::shared_ptr<hittable>> scene_objects;
-    scene_objects.push_back(std::make_shared<plane>(vec3(0, -1, 0), vec3(0, 1, 0), mat_ground)); 
-    
-    // Front spheres
-    scene_objects.push_back(std::make_shared<sphere>(vec3(0, 0, -3), 1.0, mat_glass));      // Glass in center
-    scene_objects.push_back(std::make_shared<sphere>(vec3(-2.5, 0, -3), 1.0, mat_left));    // Red left
-    scene_objects.push_back(std::make_shared<sphere>(vec3(2.5, 0, -3), 1.0, mat_right));    // Metal right
-    
-    // Three spheres BEHIND the glass (visible through refraction!)
-    scene_objects.push_back(std::make_shared<sphere>(vec3(-0.6, 0.3, -5.5), 0.5, mat_behind_red));    // Red diffuse
-    scene_objects.push_back(std::make_shared<sphere>(vec3(0, -0.2, -5.5), 0.5, mat_behind_metal));   // Shiny metal
-    scene_objects.push_back(std::make_shared<sphere>(vec3(0.6, 0.3, -5.5), 0.5, mat_behind_rough));   // Rough metal
-    
-    // Camera setup
-    vec3 lookfrom(0, 0, 0);
-    vec3 lookat(0, 0, -1);
-    vec3 vup(0, 1, 0);
-    double vfov = 90.0;
+    ifs.close();
+
+    // Load scene data into the rendering engine
+    int image_width = scene_data["render"]["image_width"];
+    int image_height = scene_data["render"]["image_height"];
+    int samples_per_pixel = scene_data["render"]["samples_per_pixel"];
+    int max_depth = scene_data["render"]["max_depth"];
+    int num_threads = scene_data["render"]["num_threads"];
+    double gamma = scene_data["render"]["gamma"];
+
+    vec3 lookfrom(
+        scene_data["camera"]["origin"]["x"],
+        scene_data["camera"]["origin"]["y"],
+        scene_data["camera"]["origin"]["z"]
+    );
+    vec3 lookat(
+        scene_data["camera"]["look_at"]["x"],
+        scene_data["camera"]["look_at"]["y"],
+        scene_data["camera"]["look_at"]["z"]
+    );
+    vec3 vup(
+        scene_data["camera"]["up"]["x"],
+        scene_data["camera"]["up"]["y"],
+        scene_data["camera"]["up"]["z"]
+    );
+    double vfov = scene_data["camera"]["fov"];
+    double aspect_ratio = scene_data["camera"]["aspect_ratio"];
+
     Camera camera(lookfrom, lookat, vup, vfov, aspect_ratio);
+    
+    std::vector<std::shared_ptr<hittable>> scene_objects;
+    for (auto& obj : scene_data["objects"]) {
+        std::string type = obj["type"];
+        vec3 center(
+            obj["position"]["x"],
+            obj["position"]["y"],
+            obj["position"]["z"]
+        );
+        
+        // Couleur de l'objet (toujours dans obj["color"])
+        vec3 color(
+            obj["color"]["r"],
+            obj["color"]["g"],
+            obj["color"]["b"]
+        );
+        
+        std::shared_ptr<material> mat;
+        std::string mat_type = obj["material"];
+        
+        if (mat_type == "Diffus") {
+            mat = std::make_shared<diffuse>(color);
+        } else if (mat_type == "Métal") {
+            double fuzz = obj.contains("roughness") ? double(obj["roughness"]) : 0.0;
+            mat = std::make_shared<metal>(color, fuzz);
+        } else if (mat_type == "Verre") {
+            double ir = obj.contains("refraction_index") ? double(obj["refraction_index"]) : 1.5;
+            mat = std::make_shared<dielectric>(ir, color);
+        } else {
+            // Matériau par défaut si inconnu
+            mat = std::make_shared<diffuse>(color);
+        }
+
+        if (type == "Sphère") {
+            double radius = obj["size"];
+            scene_objects.push_back(std::make_shared<sphere>(center, radius, mat));
+        } else if (type == "Plan") {
+            vec3 normal(0.0, 1.0, 0.0); // Default normal pointing up
+            scene_objects.push_back(std::make_shared<plane>(center, normal, mat));
+        }
+    }
+    
 
     // Output file
     std::ofstream file("image.ppm");
@@ -145,15 +196,10 @@ int main() {
             // Average color across all samples
             vec3 avg_color = total_color / samples_per_pixel;
 
-            // Normalize to [0, 1] for gamma correction
-            avg_color.x = avg_color.x / 255.0;
-            avg_color.y = avg_color.y / 255.0;
-            avg_color.z = avg_color.z / 255.0;
-
-            // Gamma correction (gamma = 2.0)
-            avg_color.x = std::sqrt(avg_color.x);
-            avg_color.y = std::sqrt(avg_color.y);
-            avg_color.z = std::sqrt(avg_color.z);
+            // Apply gamma correction (avg_color is already in [0, 1])
+            avg_color.x = std::pow(avg_color.x, 1.0 / gamma);
+            avg_color.y = std::pow(avg_color.y, 1.0 / gamma);
+            avg_color.z = std::pow(avg_color.z, 1.0 / gamma);
 
             // Convert to [0, 255] with clamping
             int r = static_cast<int>(256.0 * std::clamp(avg_color.x, 0.0, 0.999));

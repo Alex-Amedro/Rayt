@@ -11,13 +11,7 @@
 Plane::Plane(float s) 
     : size(s), VAO(0), VBO(0), EBO(0) {
     
-    std::cout << "[PLANE] Génération du plan..." << std::endl;
-    std::cout << "  Taille: " << s << "x" << s << std::endl;
-    
     generate_plane();
-    
-    std::cout << "  ✓ Plan créé (" << vertices.size() << " vertices, " 
-              << indices.size() / 3 << " triangles)" << std::endl << std::endl;
 }
 
 // ============================================================================
