@@ -6,15 +6,11 @@ A feature-rich **physically-based ray tracing engine** built from scratch in C++
 
 
 
----<!-- Add your best render here once ready:
-
-
-
 ## 🎯 Project Overview<p align="center">
 
 
 
-**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/><!-- Add your best render here once ready:
+**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:  
 
 
 
