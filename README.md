@@ -1,4 +1,4 @@
-# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Ray Tracer Project
+# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor
 
 
 
