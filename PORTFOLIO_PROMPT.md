@@ -52,7 +52,7 @@ Développer un moteur de rendu photoréaliste basé sur le ray tracing, avec un 
 ### Optimisations
 - **Rendu multi-threadé** pour performances accrues
 - **Architecture modulaire** avec séparation claire des responsabilités
-- **System de build efficace** avec Makefiles séparés (éditeur, raytracer, preview)
+- **Système de build efficace** avec Makefiles séparés (éditeur, raytracer, preview)
 
 ## 💡 Compétences développées
 
