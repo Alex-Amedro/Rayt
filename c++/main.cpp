@@ -77,7 +77,7 @@ void show_progress_bar(int current, int total) {
 
 vec3 aces_tonemap(const vec3& color) {
     // ACES filmic tone mapping curve
-    // Référence: Narkowicz 2015 "ACES Filmic Tone Mapping Curve"
+    // Reference: Narkowicz 2015 "ACES Filmic Tone Mapping Curve"
     const double a = 2.51;
     const double b = 0.03;
     const double c = 2.43;
@@ -85,7 +85,7 @@ vec3 aces_tonemap(const vec3& color) {
     const double e = 0.14;
     
     vec3 x = color;
-    vec3 numerator = x * (x * a + b);      // Fix: pas de parenthèses en trop
+    vec3 numerator = x * (x * a + b);
     vec3 denominator = x * (x * c + d) + e;
     
     return vec3(
@@ -105,8 +105,8 @@ int main() {
     std::ifstream ifs(scene_file);
 
     if (!ifs.is_open()) {
-        std::cerr << "Erreur: Impossible d'ouvrir le fichier " << scene_file << std::endl;
-        std::cerr << "Veuillez créer une scène avec l'éditeur et sauvegarder avant de lancer le raytracer.\n";
+        std::cerr << "Error: Unable to open file " << scene_file << std::endl;
+        std::cerr << "Please create a scene with the editor and save it before launching the raytracer.\n";
         return 1;
     }
     json scene_data;
@@ -114,7 +114,7 @@ int main() {
         
         ifs >> scene_data;
     } catch (json::parse_error& e) {
-        std::cerr << "Erreur de parsing JSON: " << e.what() << std::endl;
+        std::cerr << "JSON parsing error: " << e.what() << std::endl;
         ifs.close(); 
         return 1; 
     }
@@ -178,7 +178,7 @@ int main() {
             obj["position"]["z"]
         );
         
-        // Couleur de l'objet (toujours dans obj["color"])
+        // Object color (always in obj["color"])
         vec3 color(
             obj["color"]["r"],
             obj["color"]["g"],
@@ -202,7 +202,7 @@ int main() {
         } else if (mat_type == "Miroir" || mat_type == "Mirror") {
             mat = std::make_shared<mirror>(color);
         } else {
-            // Matériau par défaut si inconnu
+            // Default material if unknown
             mat = std::make_shared<diffuse>(color);
         }
 
@@ -242,10 +242,10 @@ int main() {
             // Average color across all samples
             vec3 avg_color = total_color / samples_per_pixel;
             
-            // ACES Tone Mapping (HDR → LDR avec préservation des détails)
+            // ACES Tone Mapping (HDR → LDR with detail preservation)
             avg_color = aces_tonemap(avg_color);
 
-            // Apply gamma correction APRÈS tone mapping
+            // Apply gamma correction AFTER tone mapping
             avg_color.x = std::pow(avg_color.x, 1.0 / gamma);
             avg_color.y = std::pow(avg_color.y, 1.0 / gamma);
             avg_color.z = std::pow(avg_color.z, 1.0 / gamma);

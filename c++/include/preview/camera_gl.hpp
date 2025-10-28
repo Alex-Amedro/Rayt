@@ -1,21 +1,21 @@
 // ============================================================================
-// LEÇON 4 : CAMERA OPENGL
+// LESSON 4: OPENGL CAMERA
 // ============================================================================
 //
-// Qu'est-ce qu'une caméra en OpenGL ?
+// What is a camera in OpenGL?
 //
-// C'est un objet qui dit à OpenGL :
-// - Où est l'observateur (position)
-// - Où regarde-t-il (target)
-// - Quelle est l'orientation vers le haut (up)
-// - Quel est l'angle de vision (FOV)
+// It's an object that tells OpenGL:
+// - Where is the observer (position)
+// - Where are they looking (target)
+// - What is the up orientation (up)
+// - What is the field of view (FOV)
 //
-// Tout ça se transforme en deux matrices :
-// 1. View Matrix = où et comment on regarde
-// 2. Projection Matrix = la perspective (comment ça s'écrase sur l'écran)
+// All of this transforms into two matrices:
+// 1. View Matrix = where and how we're looking
+// 2. Projection Matrix = the perspective (how it projects onto screen)
 //
-// Ces matrices sont envoyées aux shaders comme "uniforms"
-// (uniforms = variables globales pour les shaders)
+// These matrices are sent to shaders as "uniforms"
+// (uniforms = global variables for shaders)
 //
 // ============================================================================
 
@@ -28,55 +28,55 @@
 class CameraGL {
 private:
     // ====================================================================
-    // Position et orientation
+    // Position and orientation
     // ====================================================================
-    glm::vec3 position;      // Où on regarde depuis
-    glm::vec3 target;        // Où on regarde
-    glm::vec3 up;            // Direction "haut"
+    glm::vec3 position;      // Where we're looking from
+    glm::vec3 target;        // Where we're looking at
+    glm::vec3 up;            // "Up" direction
     
     // ====================================================================
     // Projection
     // ====================================================================
-    float fov;               // Field of view (angle vertical)
-    float aspect_ratio;      // Largeur / Hauteur
-    float near_plane;        // Plan proche (quoi est trop proche)
-    float far_plane;         // Plan lointain (quoi est trop loin)
+    float fov;               // Field of view (vertical angle)
+    float aspect_ratio;      // Width / Height
+    float near_plane;        // Near plane (what's too close)
+    float far_plane;         // Far plane (what's too far)
     
     // ====================================================================
-    // Matrices de transformation
+    // Transformation matrices
     // ====================================================================
     glm::mat4 view_matrix;
     glm::mat4 projection_matrix;
     
-    // Recalcule les matrices quand quelque chose change
+    // Recalculate matrices when something changes
     void update_matrices();
 
 public:
     // ====================================================================
-    // CONSTRUCTEUR
+    // CONSTRUCTOR
     // ====================================================================
-    // Crée une caméra avec position, target, et orientation
+    // Creates a camera with position, target, and orientation
     CameraGL(
-        glm::vec3 pos,           // Position de la caméra
-        glm::vec3 target,        // Où on regarde
-        glm::vec3 up,            // Direction haut (normalement (0, 1, 0))
-        float fov = 45.0f,       // Angle de vision (degrés)
-        float aspect = 16.0f/9.0f, // Ratio largeur/hauteur
-        float near_z = 0.1f,     // Plan proche
-        float far_z = 100.0f     // Plan lointain
+        glm::vec3 pos,           // Camera position
+        glm::vec3 target,        // Where we're looking
+        glm::vec3 up,            // Up direction (usually (0, 1, 0))
+        float fov = 45.0f,       // Field of view (degrees)
+        float aspect = 16.0f/9.0f, // Width/height ratio
+        float near_z = 0.1f,     // Near plane
+        float far_z = 100.0f     // Far plane
     );
     
     // ====================================================================
-    // SETTERS : Changer la caméra
+    // SETTERS: Change the camera
     // ====================================================================
     void set_position(glm::vec3 new_pos);
     void set_target(glm::vec3 new_target);
     void set_up(glm::vec3 new_up);
     void set_fov(float new_fov);
-    void set_aspect_ratio(float new_aspect);  // Nouveau : mettre à jour l'aspect ratio
+    void set_aspect_ratio(float new_aspect);  // Update aspect ratio
     
     // ====================================================================
-    // GETTERS : Récupérer les matrices
+    // GETTERS: Get the matrices
     // ====================================================================
     glm::mat4 get_view_matrix() const { return view_matrix; }
     glm::mat4 get_projection_matrix() const { return projection_matrix; }

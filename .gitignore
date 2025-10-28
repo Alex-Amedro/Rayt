@@ -72,3 +72,50 @@ c++/obj/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Archive folder (development/planning files not for portfolio)
+archive/
+
+# Image output folders
+img/
+result_img/
+c++/img/
+
+# Editor temporary files
+imgui.ini
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Build executables
+c++/main
+c++/editor
+c++/preview
+
+# Archive folder (development/planning files not for portfolio)
+archive/
+
+# Image output folders
+img/
+result_img/
+c++/img/
+
+# Editor temporary files
+imgui.ini
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Build executables
+c++/main
+c++/editor
+c++/preview
+
+# Data saves
+c++/src/data/save/*.json
