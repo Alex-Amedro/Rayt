@@ -331,6 +331,20 @@ void Scene::load_from_json(const std::string& filepath) {
         
         std::cout << "[LOAD] ✓ Scène chargée avec " << objects.size() << " objets\n";
         
+        // Charger les lights (optionnel)
+        if (scene_data.contains("lights") && scene_data["lights"].is_array()) {
+            lights.clear();
+            for (const auto& l : scene_data["lights"]) {
+                PointLight pl(
+                    vec3(l["position"]["x"], l["position"]["y"], l["position"]["z"]),
+                    vec3(l["color"]["r"], l["color"]["g"], l["color"]["b"]),
+                    float(l.contains("intensity") ? l["intensity"].get<double>() : 1.0)
+                );
+                lights.push_back(pl);
+            }
+            std::cout << "[LOAD] ✓ Loaded " << lights.size() << " lights\n";
+        }
+        
     } catch (const std::exception& e) {
         std::cerr << "[LOAD] ✗ Erreur lors du chargement : " << e.what() << "\n";
     }

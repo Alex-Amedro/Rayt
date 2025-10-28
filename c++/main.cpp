@@ -14,6 +14,7 @@ using json = nlohmann::json;
 
 #include "core/vec3.hpp"
 #include "core/camera.hpp"
+#include "core/light.hpp"
 #include "geometry/hittable.hpp"
 #include "core/ray_color.hpp"
 #include "core/denoise.hpp"
@@ -101,7 +102,7 @@ int main() {
     // Display menu
     display_menu();
     
-    std::string scene_file = "src/data/save/demo_scene.json";
+    std::string scene_file = "src/data/save/sun_demo.json";
     std::ifstream ifs(scene_file);
 
     if (!ifs.is_open()) {
@@ -135,6 +136,20 @@ int main() {
         ambient_light = scene_data["render"]["ambient_light"];
     }
     
+    // Sun intensity control (default 0.0 if not in JSON = no sun)
+    double sun_intensity = 0.0;
+    if (scene_data["render"].contains("sun_intensity")) {
+        sun_intensity = scene_data["render"]["sun_intensity"];
+    }
+    
+    // Sun direction (default: coming from above-right)
+    vec3 sun_direction(0.5, -1.0, 0.3);  // Direction FROM which sun light comes
+    if (scene_data["render"].contains("sun_direction")) {
+        sun_direction.x = scene_data["render"]["sun_direction"]["x"];
+        sun_direction.y = scene_data["render"]["sun_direction"]["y"];
+        sun_direction.z = scene_data["render"]["sun_direction"]["z"];
+    }
+    
     // Denoise settings (default: disabled)
     bool enable_denoise = false;
     int denoise_type = 1;  // 0=Box, 1=Gaussian, 2=Bilateral
@@ -166,8 +181,18 @@ int main() {
     );
     double vfov = scene_data["camera"]["fov"];
     double aspect_ratio = scene_data["camera"]["aspect_ratio"];
+    
+    // Depth of field parameters
+    double aperture = 0.0;
+    double focus_distance = 10.0;
+    if (scene_data["camera"].contains("aperture")) {
+        aperture = scene_data["camera"]["aperture"];
+    }
+    if (scene_data["camera"].contains("focus_distance")) {
+        focus_distance = scene_data["camera"]["focus_distance"];
+    }
 
-    Camera camera(lookfrom, lookat, vup, vfov, aspect_ratio);
+    Camera camera(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, focus_distance);
     
     std::vector<std::shared_ptr<hittable>> scene_objects;
     for (auto& obj : scene_data["objects"]) {
@@ -216,6 +241,58 @@ int main() {
     }
     
 
+    // Load point lights from JSON
+
+    std::vector<PointLight> lights;
+
+    if (scene_data.contains("lights")) {
+
+        for (auto& light_json : scene_data["lights"]) {
+
+            vec3 position(
+
+                light_json["position"]["x"],
+
+                light_json["position"]["y"],
+
+                light_json["position"]["z"]
+
+            );
+
+            vec3 color(
+
+                light_json["color"]["r"],
+
+                light_json["color"]["g"],
+
+                light_json["color"]["b"]
+
+            );
+
+            float intensity = light_json["intensity"];
+
+            lights.push_back(PointLight(position, color, intensity));
+
+        }
+
+    }
+
+    std::cout << "\n💡 Loaded " << lights.size() << " point lights\n" << std::flush;
+    
+    // ========== CREATE DIRECTIONAL LIGHT (SUN) ==========
+    std::optional<DirectionalLight> sun;
+    if (sun_intensity > 0.0) {
+        sun = DirectionalLight(
+            sun_direction,                     // Direction from which light comes
+            vec3(1.0, 1.0, 0.95),             // Slightly warm white color
+            static_cast<float>(sun_intensity)  // Intensity from UI
+        );
+        std::cout << "☀️  Sun enabled with intensity " << sun_intensity << "\n" << std::flush;
+    } else {
+        std::cout << "🌙 Sun disabled (intensity = 0)\n" << std::flush;
+    }
+    
+
     // Store pixels in memory for denoising
     std::vector<vec3> pixels(image_width * image_height);
 
@@ -233,8 +310,9 @@ int main() {
                 double u = (double(x) + distribution(generator)) / (image_width - 1);
                 double v = (double(y) + distribution(generator)) / (image_height - 1);
 
-                vec3 ray_direction = camera.get_ray_direction(u, v);
-                vec3 pixel_color = ray_color(camera.origin, ray_direction, scene_objects, max_depth, ambient_light);
+                vec3 ray_origin = camera.get_ray_origin(generator, distribution);
+                vec3 ray_direction = camera.get_ray_direction(u, v, generator, distribution);
+                vec3 pixel_color = ray_color(ray_origin, ray_direction, scene_objects, lights, sun, max_depth, ambient_light);
 
                 total_color = total_color + pixel_color;
             }

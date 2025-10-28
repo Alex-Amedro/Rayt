@@ -58,8 +58,11 @@ private:
     float focus_distance = 10.0f;
     
     // Environment
-    float sun_intensity = 1.0f;
-    float ambient_light = 1.0f;  // 1.0 = full sky, 0.0 = black (for dramatic neon scenes)
+    float sun_intensity = 0.0f;      // 0.0 par défaut = désactivé
+    float sun_direction_x = 0.5f;    // Direction X from which sun light comes
+    float sun_direction_y = -1.0f;   // Direction Y (negative = from above)
+    float sun_direction_z = 0.3f;    // Direction Z
+    float ambient_light = 0.3f;      // Réduit pour scènes sombres/néons
     float gamma = 2.2f;
     
     // Post-processing

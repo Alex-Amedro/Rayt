@@ -1,18 +1,18 @@
 {
     "camera": {
         "aperture": 0.0,
-        "aspect_ratio": 1.7777777777777777,
+        "aspect_ratio": 1.7791666666666666,
         "focus_distance": 10.0,
         "fov": 45.0,
         "look_at": {
-            "x": 0.20241275429725647,
-            "y": 2.5814592838287354,
-            "z": 5.143567085266113
+            "x": -4.371138828673793e-08,
+            "y": 2.0,
+            "z": 9.0
         },
         "origin": {
-            "x": 0.14118050038814545,
-            "y": 2.897108316421509,
-            "z": 6.090465545654297
+            "x": 0.0,
+            "y": 2.0,
+            "z": 10.0
         },
         "up": {
             "x": 0.0,
@@ -20,6 +20,7 @@
             "z": 0.0
         }
     },
+    "lights": [],
     "objects": [
         {
             "color": {
@@ -27,7 +28,7 @@
                 "g": 0.949999988079071,
                 "r": 0.949999988079071
             },
-            "material": "Diffus",
+            "material": "Miroir",
             "name": "Plan",
             "position": {
                 "x": 0.0,
@@ -158,11 +159,16 @@
     "render": {
         "ambient_light": 0.15000000596046448,
         "gamma": 2.200000047683716,
-        "image_height": 1080,
-        "image_width": 1920,
-        "max_depth": 75,
+        "image_height": 480,
+        "image_width": 854,
+        "max_depth": 10,
         "num_threads": 8,
-        "samples_per_pixel": 300,
-        "sun_intensity": 1.0
+        "samples_per_pixel": 100,
+        "sun_direction": {
+            "x": 0.5,
+            "y": -1.0,
+            "z": 0.30000001192092896
+        },
+        "sun_intensity": 0.8510000109672546
     }
 }

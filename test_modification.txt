@@ -1,0 +1,4 @@
+Ceci est un fichier de test.
+Ligne 2: Contenu MODIFIÉ avec succès!
+Ligne 3: Autre contenu.
+Ligne 4: Dernière ligne.

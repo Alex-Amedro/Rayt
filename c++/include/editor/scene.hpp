@@ -38,6 +38,7 @@
 
 #include "scene_object.hpp"
 #include <vector>
+#include "../core/light.hpp"
 
 // Forward declarations (on inclura les headers dans le .cpp)
 class ShaderManager;
@@ -51,6 +52,7 @@ class Grid;
 class Scene {
 private:
     std::vector<SceneObject*> objects;  // Liste de tous les objets
+    std::vector<PointLight> lights;     // Liste des point lights
     int selected_index;                 // Index de l'objet sélectionné (-1 si aucun)
     bool wireframe_enabled;             // Afficher le wireframe ?
     bool grid_enabled;                  // Afficher la grille ?
@@ -139,4 +141,10 @@ public:
     // SAUVEGARDE / CHARGEMENT (JSON)
     // ====================================================================
     void load_from_json(const std::string& filepath);
+    
+    // Lights API for editor
+    std::vector<PointLight>& get_lights() { return lights; }
+    const std::vector<PointLight>& get_lights() const { return lights; }
+    void add_light(const PointLight& l) { lights.push_back(l); }
+    void remove_light(size_t idx) { if (idx < lights.size()) lights.erase(lights.begin() + idx); }
 };

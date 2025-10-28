@@ -321,10 +321,37 @@ void EditorUI::render_actions() {
             ImGui::SliderFloat("Focus Distance", &focus_distance, 1.0f, 100.0f);
             
             ImGui::Spacing();
+            ImGui::Separator();
+            
+            // ====================================================================
+            // SECTION SOLEIL (Directional Light)
+            // ====================================================================
+            ImGui::Text("☀️ Lumière du Soleil");
+            ImGui::Spacing();
+            
+            ImGui::SliderFloat("Intensité du Soleil", &sun_intensity, 0.0f, 2.0f);
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), 
+                "0.0 = désactivé, 0.3-0.5 = doux, 1.0 = normal, 2.0 = très fort");
+            
+            if (sun_intensity > 0.0f) {
+                ImGui::Spacing();
+                ImGui::Text("Direction du Soleil (d'où vient la lumière)");
+                ImGui::SliderFloat("Direction X##sun", &sun_direction_x, -1.0f, 1.0f);
+                ImGui::SliderFloat("Direction Y##sun", &sun_direction_y, -1.0f, 1.0f);
+                ImGui::SliderFloat("Direction Z##sun", &sun_direction_z, -1.0f, 1.0f);
+                ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), 
+                    "Y négatif = vient d'en haut");
+                ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), 
+                    "Exemple: (0.5, -1.0, 0.3) = soleil en haut à droite");
+            }
+            
+            ImGui::Spacing();
+            ImGui::Separator();
+            
             ImGui::Text("Environnement");
-            ImGui::SliderFloat("Sun Intensity", &sun_intensity, 0.0f, 2.0f);
             ImGui::SliderFloat("Ambient Light", &ambient_light, 0.0f, 1.0f);
-            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "0.0 = noir complet, 1.0 = ciel complet");
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), 
+                "0.0 = noir complet, 0.3 = sombre (néons), 1.0 = ciel bleu complet");
             
             ImGui::Spacing();
             ImGui::Text("Post-Processing");
@@ -374,6 +401,9 @@ void EditorUI::render_actions() {
                 scene_data["render"]["samples_per_pixel"] = samples_per_pixel;
                 scene_data["render"]["max_depth"] = max_depth;
                 scene_data["render"]["sun_intensity"] = sun_intensity;
+                scene_data["render"]["sun_direction"]["x"] = sun_direction_x;
+                scene_data["render"]["sun_direction"]["y"] = sun_direction_y;
+                scene_data["render"]["sun_direction"]["z"] = sun_direction_z;
                 scene_data["render"]["ambient_light"] = ambient_light;
                 scene_data["render"]["gamma"] = gamma;
                 scene_data["render"]["enable_denoise"] = enable_denoise;
@@ -411,6 +441,21 @@ void EditorUI::render_actions() {
                 }
 
                 std::string save_path = "../c++/src/data/save/save1.json";
+
+                // Save lights to JSON
+                scene_data["lights"] = json::array();
+                auto& lights = scene.get_lights();
+                for (const auto& light : lights) {
+                    json light_data;
+                    light_data["position"]["x"] = light.position.x;
+                    light_data["position"]["y"] = light.position.y;
+                    light_data["position"]["z"] = light.position.z;
+                    light_data["color"]["r"] = light.color.x;
+                    light_data["color"]["g"] = light.color.y;
+                    light_data["color"]["b"] = light.color.z;
+                    light_data["intensity"] = light.intensity;
+                    scene_data["lights"].push_back(light_data);
+                }
                 std::ofstream ofs(save_path);
                 ofs << scene_data.dump(4);
                 ofs.close();
@@ -422,7 +467,7 @@ void EditorUI::render_actions() {
         
         // Bouton Load
         if (ImGui::Button("Load", ImVec2(-1, 0))) {
-            std::string load_path = "../c++/src/data/save/neon_showcase.json";
+            std::string load_path = "../c++/src/data/save/sun_demo.json";
             scene.load_from_json(load_path);
             
             // Load render settings from JSON
@@ -441,10 +486,21 @@ void EditorUI::render_actions() {
                         max_depth = scene_data["render"]["max_depth"];
                     if (scene_data["render"].contains("sun_intensity"))
                         sun_intensity = scene_data["render"]["sun_intensity"];
+                    if (scene_data["render"].contains("sun_direction")) {
+                        sun_direction_x = scene_data["render"]["sun_direction"]["x"];
+                        sun_direction_y = scene_data["render"]["sun_direction"]["y"];
+                        sun_direction_z = scene_data["render"]["sun_direction"]["z"];
+                    }
                     if (scene_data["render"].contains("ambient_light"))
                         ambient_light = scene_data["render"]["ambient_light"];
                     if (scene_data["render"].contains("gamma"))
                         gamma = scene_data["render"]["gamma"];
+                    if (scene_data["render"].contains("enable_denoise"))
+                        enable_denoise = scene_data["render"]["enable_denoise"];
+                    if (scene_data["render"].contains("denoise_type"))
+                        denoise_type = scene_data["render"]["denoise_type"];
+                    if (scene_data["render"].contains("denoise_strength"))
+                        denoise_strength = scene_data["render"]["denoise_strength"];
                     if (scene_data["render"].contains("num_threads"))
                         num_threads = scene_data["render"]["num_threads"];
                 }
@@ -489,6 +545,9 @@ void EditorUI::render_actions() {
                 scene_data["render"]["samples_per_pixel"] = samples_per_pixel;
                 scene_data["render"]["max_depth"] = max_depth;
                 scene_data["render"]["sun_intensity"] = sun_intensity;
+                scene_data["render"]["sun_direction"]["x"] = sun_direction_x;
+                scene_data["render"]["sun_direction"]["y"] = sun_direction_y;
+                scene_data["render"]["sun_direction"]["z"] = sun_direction_z;
                 scene_data["render"]["ambient_light"] = ambient_light;
                 scene_data["render"]["gamma"] = gamma;
                 scene_data["render"]["num_threads"] = num_threads;
@@ -521,6 +580,21 @@ void EditorUI::render_actions() {
                 }
 
                 std::string save_path = "../c++/src/data/save/demo_scene.json";
+
+                // Save lights to JSON
+                scene_data["lights"] = json::array();
+                auto& lights = scene.get_lights();
+                for (const auto& light : lights) {
+                    json light_data;
+                    light_data["position"]["x"] = light.position.x;
+                    light_data["position"]["y"] = light.position.y;
+                    light_data["position"]["z"] = light.position.z;
+                    light_data["color"]["r"] = light.color.x;
+                    light_data["color"]["g"] = light.color.y;
+                    light_data["color"]["b"] = light.color.z;
+                    light_data["intensity"] = light.intensity;
+                    scene_data["lights"].push_back(light_data);
+                }
                 std::ofstream ofs(save_path);
                 ofs << scene_data.dump(4);
                 ofs.close();
