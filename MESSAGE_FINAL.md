@@ -125,12 +125,13 @@ Sur GitHub.com:
 ### Sur ton CV
 ```
 RAY TRACER avec ÉDITEUR 3D INTERACTIF          GitHub: /Alex-Amedro/Rayt
-C++17 | OpenGL | ImGui | Multi-threading
+C++17 | OpenGL | ImGui | Path Tracing
 
 • Path tracing physiquement réaliste avec illumination globale
 • Éditeur 3D temps réel (OpenGL + ImGui) pour création de scènes
 • 5 types de matériaux (diffus, métal, verre, émissif, miroir)
-• Optimisation multi-thread (speedup 6-7x sur 8 cœurs)
+• ACES tone mapping (standard industrie comme Unreal Engine)
+• Système de denoising avec 3 filtres différents
 • 3 500+ lignes de C++ moderne, architecture modulaire propre
 ```
 

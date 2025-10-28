@@ -49,24 +49,7 @@ This ray tracer project represents a comprehensive exploration of computer graph
 - UI/UX design capabilities
 - File I/O and data structure management
 
-### 4. **Performance & Scalability**
-- ✅ Multi-threaded rendering architecture (designed to scale with CPU cores)
-- ✅ Configurable quality vs performance tradeoffs
-- ✅ Ray-geometry intersection algorithms
-- ✅ Denoising post-processing for noise reduction
-
-**Architecture Features:**
-- Parallel rendering structure using `std::thread`
-- Configurable thread count for different hardware
-- Modular design allowing for future optimizations (BVH planned)
-
-**What this demonstrates:**
-- Proficiency in concurrent programming (`std::thread`, parallel design)
-- Understanding of scalable architecture patterns
-- Ability to design systems with performance in mind
-- Foundation for future optimizations (BVH, SIMD, GPU acceleration)
-
-### 5. **Advanced Rendering Features**
+### 4. **Advanced Rendering Features**
 - ✅ **ACES Tone Mapping**: Industry-standard HDR→LDR conversion (same as Unreal Engine)
 - ✅ **Gamma Correction**: Proper color space management
 - ✅ **Anti-Aliasing**: Multi-sample per pixel (configurable quality)
@@ -143,7 +126,7 @@ This ray tracer project represents a comprehensive exploration of computer graph
 ### Skills Gained
 1. **Graphics Programming**: Ray tracing, rasterization, shaders (GLSL)
 2. **Mathematics**: Applied linear algebra, optics, probability
-3. **C++**: Advanced features, memory management, multi-threading
+3. **C++**: Advanced features, memory management, STL containers
 4. **Tools**: Makefiles, Git, VS Code, GDB
 5. **Libraries**: ImGui, GLFW, GLEW, GLM, nlohmann/json
 6. **Problem Solving**: Debugging complex visual artifacts, architecture design
@@ -154,23 +137,27 @@ This ray tracer project represents a comprehensive exploration of computer graph
 
 ### Planned Enhancements
 
-1. **Triangle Mesh Support** 
+1. **Multi-Threading**
+   - Parallel rendering for improved performance
+   - Demonstrates: Concurrent programming, `std::thread`, load balancing
+
+2. **Triangle Mesh Support** 
    - Load OBJ/STL 3D models
    - Demonstrates: File parsing, complex geometry
 
-2. **BVH Acceleration Structure**
+3. **BVH Acceleration Structure**
    - 10-100x performance improvement potential
    - Demonstrates: Advanced data structures, spatial algorithms
 
-3. **Point Lights & Shadow Rays**
+4. **Point Lights & Shadow Rays**
    - Explicit light sampling for faster convergence
    - Demonstrates: Advanced sampling techniques
 
-4. **Texture Mapping**
+5. **Texture Mapping**
    - UV coordinates, image-based textures
    - Demonstrates: Image processing, interpolation
 
-5. **GPU Acceleration (CUDA)**
+6. **GPU Acceleration (CUDA)**
    - Real-time path tracing (30+ FPS)
    - Demonstrates: Parallel computing, GPU programming
 

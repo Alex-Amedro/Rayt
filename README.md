@@ -1,272 +1,542 @@
-# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Ray Tracer Project
+# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Advanced C++ Ray Tracer with Interactive 3D Editor# Rayt - Ray Tracer Project
 
 
 
-<!-- Add your best render here once ready:
-
-<p align="center">
-
-  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/><!-- Add your best render here once ready:
-
-</p>
-
---><p align="center">
+A feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.
 
 
 
-A feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/><p align="center">Projet de ray tracing en C++.
+---<!-- Add your best render here once ready:
 
 
 
----</p>
+## 🎯 Project Overview<p align="center">
 
 
 
-## 🎯 Project Overview-->  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/>
+**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/><!-- Add your best render here once ready:
 
 
 
-**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:
-
-
-
-- **Path Tracing Algorithm**: Full global illumination with multiple bounce lightingA feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.</p>## 🛠️ Configuration de l'environnement
+- **Path Tracing Algorithm**: Full global illumination with multiple bounce lighting</p>
 
 - **Interactive 3D Editor**: Real-time OpenGL preview with ImGui-based interface
 
-- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials
+- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials--><p align="center">
 
-- **Advanced Features**: Multi-threading architecture, denoising system, anti-aliasing, and tone mapping
+- **Advanced Features**: Denoising system, anti-aliasing, and ACES tone mapping
 
-- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes---
+- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes
 
 
 
-This project was developed as a learning experience in computer graphics, demonstrating proficiency in:
+This project was developed as a learning experience in computer graphics, demonstrating proficiency in:A feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/><p align="center">Projet de ray tracing en C++.
 
 - Modern C++ (C++17) with STL
 
-- 3D mathematics and ray-geometry intersection algorithms## 🎯 Project OverviewA feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.### Prérequis installés
+- 3D mathematics and ray-geometry intersection algorithms
 
 - OpenGL for real-time rendering
 
-- UI/UX design with ImGui
+- UI/UX design with ImGui---</p>
 
-- Multi-threaded application architecture
-
-- Software engineering best practices**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:- ✅ **g++** (version 13.3.0) - Compilateur C++
+- Software engineering best practices
 
 
 
 ---
 
+## 🎯 Project Overview-->  <img src="docs/hero_render.png" alt="Ray Traced Scene" width="800"/>
+
+## ✨ Key Features
 
 
-## ✨ Key Features- **Path Tracing Algorithm**: Full global illumination with multiple bounce lighting---- ✅ **gdb** (version 15.0) - Débogueur
 
+### 🎨 Ray Tracing Engine
 
+- **Path Tracing**: Physically accurate light simulation with configurable bounce depth**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:
 
-### 🎨 Ray Tracing Engine- **Interactive 3D Editor**: Real-time OpenGL preview with ImGui-based interface
-
-- **Path Tracing**: Physically accurate light simulation with configurable bounce depth
-
-- **Multiple Geometries**: Spheres and infinite planes with efficient intersection algorithms- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials- ✅ **VS Code Extensions** :
+- **Multiple Geometries**: Spheres and infinite planes with efficient intersection algorithms
 
 - **Material System**: 
 
-  - **Diffuse**: Lambertian reflection with realistic light scattering- **Advanced Features**: Multi-threading, denoising system, anti-aliasing, and tone mapping
+  - **Diffuse**: Lambertian reflection with realistic light scattering
 
-  - **Metal**: Configurable roughness for brushed to polished metal surfaces
+  - **Metal**: Configurable roughness for brushed to polished metal surfaces- **Path Tracing Algorithm**: Full global illumination with multiple bounce lightingA feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.</p>## 🛠️ Configuration de l'environnement
 
-  - **Dielectric**: Glass-like materials with refraction and internal reflection- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes## 🎯 Project Overview  - C/C++ IntelliSense (ms-vscode.cpptools)
+  - **Dielectric**: Glass-like materials with refraction and internal reflection
 
-  - **Emissive**: Self-illuminating materials for light sources
+  - **Emissive**: Self-illuminating materials for light sources- **Interactive 3D Editor**: Real-time OpenGL preview with ImGui-based interface
 
   - **Mirror**: Perfect specular reflection
 
-- **Anti-Aliasing**: Multi-sample per pixel (MSAA) for smooth edges
+- **Anti-Aliasing**: Multi-sample per pixel (MSAA) for smooth edges- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials
 
-- **Gamma Correction**: Proper color space managementThis project was developed as a learning experience in computer graphics, demonstrating proficiency in:  - CMake Tools
+- **ACES Tone Mapping**: Industry-standard HDR to LDR conversion (same as Unreal Engine)
 
-- **Multi-Threading Architecture**: Parallel rendering design for scalability
+- **Gamma Correction**: Proper color space management- **Advanced Features**: Multi-threading architecture, denoising system, anti-aliasing, and tone mapping
 
-- Modern C++ (C++17) with STL
+- **Denoising**: Three filter types (box, Gaussian, bilateral) for noise reduction
+
+- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes---
 
 ### 🖥️ Interactive 3D Editor
 
-- **Real-Time OpenGL Preview**: Instant visual feedback while editing scenes- 3D mathematics and ray-geometry intersection algorithms**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:  - C/C++ Extension Pack
+- **Real-Time OpenGL Preview**: Instant visual feedback while editing scenes
 
 - **ImGui Interface**: Professional, intuitive controls for all scene parameters
 
-- **3D Gizmo**: Interactive manipulation of objects in 3D space- OpenGL for real-time rendering
+- **3D Gizmo**: Interactive manipulation of objects in 3D spaceThis project was developed as a learning experience in computer graphics, demonstrating proficiency in:
 
 - **Camera Controls**: 
 
-  - Orbit rotation with mouse drag- UI/UX design with ImGui
+  - Orbit rotation with mouse drag- Modern C++ (C++17) with STL
 
   - Zoom with mouse wheel
 
-  - Pan with middle mouse button- Multi-threaded application architecture
+  - Pan with middle mouse button- 3D mathematics and ray-geometry intersection algorithms## 🎯 Project OverviewA feature-rich **physically-based ray tracing engine** built from scratch in C++17, featuring an interactive OpenGL-based scene editor with real-time preview capabilities.### Prérequis installés
 
 - **Ray Picking**: Click objects to select them directly in the viewport
 
-- **Wireframe Mode**: Toggle between solid and wireframe rendering- Software engineering best practices- **Path Tracing Algorithm**: Full global illumination with multiple bounce lighting### Configuration VS Code
+- **Wireframe Mode**: Toggle between solid and wireframe rendering- OpenGL for real-time rendering
 
 - **Scene Hierarchy**: Manage multiple objects with easy add/remove functionality
 
-
+- UI/UX design with ImGui
 
 ### ⚙️ Rendering Configuration
 
-- **Resolution Presets**: Quick selection from 480p to 4K (3840×2160)---- **Interactive 3D Editor**: Real-time OpenGL preview with ImGui-based interfaceLes fichiers de configuration suivants ont été créés dans `.vscode/` :
+- **Resolution Presets**: Quick selection from 480p to 4K (3840×2160)- Multi-threaded application architecture
 
 - **Custom Resolution**: Fine-tune width and height independently
 
-- **Quality Settings**:
+- **Quality Settings**:- Software engineering best practices**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:- ✅ **g++** (version 13.3.0) - Compilateur C++
 
   - Samples per pixel (1-1000+) for anti-aliasing quality
 
-  - Max ray bounce depth (1-50) for light transport accuracy## ✨ Key Features- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials- `c_cpp_properties.json` - Configuration IntelliSense (C++17)
+  - Max ray bounce depth (1-50) for light transport accuracy
 
   - Gamma correction factor
 
-- **Performance Options**: Configurable thread count for optimal CPU utilization
+  - Ambient light control for scene mood---
 
 
 
-### 💾 Scene Management### 🎨 Ray Tracing Engine- **Advanced Features**: Multi-threading, denoising system, anti-aliasing, and tone mapping- `tasks.json` - Tâches de compilation
+### 💾 Scene Management
 
 - **JSON Serialization**: Save and load complete scenes
 
-- **Persistent Settings**: Camera position, render settings, and object properties- **Path Tracing**: Physically accurate light simulation with configurable bounce depth
+- **Persistent Settings**: Camera position, render settings, and object properties## ✨ Key Features- **Path Tracing Algorithm**: Full global illumination with multiple bounce lighting---- ✅ **gdb** (version 15.0) - Débogueur
 
 - **Export Ready**: Generate high-quality renders for portfolio or presentation
 
-- **Multiple Geometries**: Spheres and infinite planes with efficient intersection algorithms- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes- `launch.json` - Configuration du débogueur
+
 
 ---
 
-- **Material System**: 
+### 🎨 Ray Tracing Engine- **Interactive 3D Editor**: Real-time OpenGL preview with ImGui-based interface
 
 ## 🛠️ Technologies & Tools
 
-  - **Diffuse**: Lambertian reflection with realistic light scattering- `settings.json` - Paramètres de l'éditeur
+- **Path Tracing**: Physically accurate light simulation with configurable bounce depth
 
 | Category | Technologies |
 
-|----------|-------------|  - **Metal**: Configurable roughness for brushed to polished metal surfaces
+|----------|-------------|- **Multiple Geometries**: Spheres and infinite planes with efficient intersection algorithms- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials- ✅ **VS Code Extensions** :
 
 | **Language** | C++17 |
 
-| **Graphics APIs** | OpenGL 3.3+, GLFW, GLEW |  - **Dielectric**: Glass-like materials with refraction and internal reflectionThis project was developed as a learning experience in computer graphics, demonstrating proficiency in:
+| **Graphics APIs** | OpenGL 3.3+, GLFW, GLEW, GLM |- **Material System**: 
 
 | **UI Framework** | Dear ImGui, ImGuizmo |
 
-| **Build System** | Makefile (GCC/G++) |  - **Emissive**: Self-illuminating materials for light sources
+| **Build System** | Makefile (GCC/G++) |  - **Diffuse**: Lambertian reflection with realistic light scattering- **Advanced Features**: Multi-threading, denoising system, anti-aliasing, and tone mapping
 
-| **Libraries** | nlohmann/json, STL (threading, filesystem) |
+| **Libraries** | nlohmann/json, STL (containers, filesystem) |
 
-| **Development** | VS Code, GDB debugger |  - **Mirror**: Perfect specular reflection- Modern C++ (C++17) with STL## 🚀 Utilisation
+| **Development** | VS Code, GDB debugger |  - **Metal**: Configurable roughness for brushed to polished metal surfaces
 
 | **Math** | Custom Vec3 implementation for vectors and colors |
 
-- **Anti-Aliasing**: Multi-sample per pixel (MSAA) for smooth edges
+  - **Dielectric**: Glass-like materials with refraction and internal reflection- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes## 🎯 Project Overview  - C/C++ IntelliSense (ms-vscode.cpptools)
 
 ---
 
-- **Gamma Correction**: Proper color space management- 3D mathematics and ray-geometry intersection algorithms
+  - **Emissive**: Self-illuminating materials for light sources
 
 ## 🚀 Getting Started
 
-- **Multi-Threading**: Parallel rendering for improved performance
+  - **Mirror**: Perfect specular reflection
 
 ### Prerequisites
 
-- OpenGL for real-time rendering### Compilation rapide
+- **Anti-Aliasing**: Multi-sample per pixel (MSAA) for smooth edges
 
 ```bash
 
-# Ubuntu/Debian### 🖥️ Interactive 3D Editor
+# Ubuntu/Debian- **Gamma Correction**: Proper color space managementThis project was developed as a learning experience in computer graphics, demonstrating proficiency in:  - CMake Tools
 
-sudo apt-get install build-essential libglfw3-dev libglew-dev
+sudo apt-get install build-essential libglfw3-dev libglew-dev libglm-dev
 
-- **Real-Time OpenGL Preview**: Instant visual feedback while editing scenes- UI/UX design with ImGui```bash
+- **Multi-Threading Architecture**: Parallel rendering design for scalability
 
 # Fedora
 
-sudo dnf install gcc-c++ glfw-devel glew-devel- **ImGui Interface**: Professional, intuitive controls for all scene parameters
+sudo dnf install gcc-c++ glfw-devel glew-devel glm-devel- Modern C++ (C++17) with STL
 
 
 
-# macOS- **3D Gizmo**: Interactive manipulation of objects in 3D space- Multi-threaded application architecture# Compiler le fichier courant
+# macOS### 🖥️ Interactive 3D Editor
 
-brew install glfw glew
+brew install glfw glew glm
 
-```- **Camera Controls**: 
-
-
-
-### Building the Project  - Orbit rotation with mouse drag- Software engineering best practicesg++ -std=c++17 -Wall -o test test.cpp
+```- **Real-Time OpenGL Preview**: Instant visual feedback while editing scenes- 3D mathematics and ray-geometry intersection algorithms**Rayt** is a comprehensive ray tracing project demonstrating advanced computer graphics techniques, including:  - C/C++ Extension Pack
 
 
 
-The project includes three main executables:  - Zoom with mouse wheel
+### Building the Project- **ImGui Interface**: Professional, intuitive controls for all scene parameters
 
 
 
-#### 1. **Main Ray Tracer** (Command-line renderer)  - Pan with middle mouse button
+The project includes three main executables:- **3D Gizmo**: Interactive manipulation of objects in 3D space- OpenGL for real-time rendering
+
+
+
+#### 1. **Main Ray Tracer** (Command-line renderer)- **Camera Controls**: 
 
 ```bash
 
-cd c++- **Ray Picking**: Click objects to select them directly in the viewport
+cd c++  - Orbit rotation with mouse drag- UI/UX design with ImGui
 
 make main
 
-./main- **Wireframe Mode**: Toggle between solid and wireframe rendering---# Avec optimisations
+./main  - Zoom with mouse wheel
 
 ```
 
-- **Scene Hierarchy**: Manage multiple objects with easy add/remove functionality
+  - Pan with middle mouse button- Multi-threaded application architecture
 
 #### 2. **Interactive Editor** (3D scene editor with OpenGL preview)
 
-```bashg++ -std=c++17 -Wall -O3 -o test test.cpp
+```bash- **Ray Picking**: Click objects to select them directly in the viewport
 
 cd c++
 
-make editor### ⚙️ Rendering Configuration
+make editor- **Wireframe Mode**: Toggle between solid and wireframe rendering- Software engineering best practices- **Path Tracing Algorithm**: Full global illumination with multiple bounce lighting### Configuration VS Code
 
 ./editor
 
-```- **Resolution Presets**: Quick selection from 480p to 4K (3840×2160)## ✨ Key Features```
+```- **Scene Hierarchy**: Manage multiple objects with easy add/remove functionality
 
 
 
-#### 3. **Real-Time Preview** (OpenGL-only fast preview)- **Custom Resolution**: Fine-tune width and height independently
+#### 3. **Real-Time Preview** (OpenGL-only fast preview)
 
 ```bash
 
-cd c++- **Quality Settings**:
+cd c++### ⚙️ Rendering Configuration
 
 make preview
 
-./preview  - Samples per pixel (1-1000+) for anti-aliasing quality
+./preview- **Resolution Presets**: Quick selection from 480p to 4K (3840×2160)---- **Interactive 3D Editor**: Real-time OpenGL preview with ImGui-based interfaceLes fichiers de configuration suivants ont été créés dans `.vscode/` :
 
 ```
 
-  - Max ray bounce depth (1-50) for light transport accuracy### 🎨 Ray Tracing Engine### Utilisation du Makefile
+- **Custom Resolution**: Fine-tune width and height independently
 
 ### Quick Render
 
-  - Gamma correction factor
+- **Quality Settings**:
 
 ```bash
 
-# Render with default settings- **Performance Options**: Configurable thread count for optimal CPU utilization- **Path Tracing**: Physically accurate light simulation with configurable bounce depth```bash
+# Render with default settings  - Samples per pixel (1-1000+) for anti-aliasing quality
 
 ./main
 
+  - Max ray bounce depth (1-50) for light transport accuracy## ✨ Key Features- **Physically-Based Materials**: Diffuse (Lambertian), metallic, dielectric (glass), emissive, and mirror materials- `c_cpp_properties.json` - Configuration IntelliSense (C++17)
 
+# The output will be saved as image.ppm
+
+# Convert to PNG (requires ImageMagick)  - Gamma correction factor
+
+convert image.ppm output.png
+
+```- **Performance Options**: Configurable thread count for optimal CPU utilization
+
+
+
+---
+
+
+
+## 📖 Usage Guide### 💾 Scene Management### 🎨 Ray Tracing Engine- **Advanced Features**: Multi-threading, denoising system, anti-aliasing, and tone mapping- `tasks.json` - Tâches de compilation
+
+
+
+### Using the Editor- **JSON Serialization**: Save and load complete scenes
+
+
+
+1. **Launch the editor**:- **Persistent Settings**: Camera position, render settings, and object properties- **Path Tracing**: Physically accurate light simulation with configurable bounce depth
+
+   ```bash
+
+   ./editor- **Export Ready**: Generate high-quality renders for portfolio or presentation
+
+   ```
+
+- **Multiple Geometries**: Spheres and infinite planes with efficient intersection algorithms- **Scene Management**: JSON-based scene serialization for saving and loading complex scenes- `launch.json` - Configuration du débogueur
+
+2. **Create your scene**:
+
+   - Use "Add Object" to insert spheres or planes---
+
+   - Select objects by clicking them in the 3D viewport
+
+   - Adjust properties (position, radius, color, material) in the UI panel- **Material System**: 
+
+   - Configure camera position and orientation
+
+## 🛠️ Technologies & Tools
+
+3. **Configure render settings**:
+
+   - Choose resolution preset or set custom dimensions  - **Diffuse**: Lambertian reflection with realistic light scattering- `settings.json` - Paramètres de l'éditeur
+
+   - Adjust samples per pixel for quality (more = smoother but slower)
+
+   - Set max depth for light bounces (more = more realistic reflections)| Category | Technologies |
+
+
+
+4. **Save your scene**:|----------|-------------|  - **Metal**: Configurable roughness for brushed to polished metal surfaces
+
+   - Use "Save Scene" to export as JSON
+
+   - Scenes are saved in `c++/src/data/save/`| **Language** | C++17 |
+
+
+
+5. **Render final image**:| **Graphics APIs** | OpenGL 3.3+, GLFW, GLEW |  - **Dielectric**: Glass-like materials with refraction and internal reflectionThis project was developed as a learning experience in computer graphics, demonstrating proficiency in:
+
+   - Click "Render Ray Traced Image"
+
+   - High-quality rendering will begin (may take several minutes)| **UI Framework** | Dear ImGui, ImGuizmo |
+
+   - Output saved as `image.ppm`
+
+| **Build System** | Makefile (GCC/G++) |  - **Emissive**: Self-illuminating materials for light sources
+
+### Material Types Guide
+
+| **Libraries** | nlohmann/json, STL (threading, filesystem) |
+
+- **Diffuse**: Use for matte surfaces (wood, stone, paper)
+
+  - Parameter: Base color| **Development** | VS Code, GDB debugger |  - **Mirror**: Perfect specular reflection- Modern C++ (C++17) with STL## 🚀 Utilisation
+
+  
+
+- **Metal**: Use for metallic surfaces| **Math** | Custom Vec3 implementation for vectors and colors |
+
+  - Parameters: Base color, roughness (0.0 = mirror, 1.0 = rough)
+
+  - **Anti-Aliasing**: Multi-sample per pixel (MSAA) for smooth edges
+
+- **Dielectric**: Use for transparent materials (glass, water)
+
+  - Parameter: Index of refraction (glass ≈ 1.5)---
+
+  
+
+- **Emissive**: Use for light sources- **Gamma Correction**: Proper color space management- 3D mathematics and ray-geometry intersection algorithms
+
+  - Parameters: Emission color, intensity
+
+  ## 🚀 Getting Started
+
+- **Mirror**: Perfect reflective surface
+
+- **Multi-Threading**: Parallel rendering for improved performance
+
+---
+
+### Prerequisites
+
+## 🎓 What I Learned
+
+- OpenGL for real-time rendering### Compilation rapide
+
+This project was a deep dive into computer graphics and software engineering:
+
+```bash
+
+### Computer Graphics Concepts
+
+- **Ray Tracing Fundamentals**: Ray-geometry intersection, Snell's law for refraction, Fresnel equations# Ubuntu/Debian### 🖥️ Interactive 3D Editor
+
+- **Physically-Based Rendering**: BRDF models, importance sampling, Monte Carlo integration
+
+- **Light Transport**: Global illumination, caustics, color bleedingsudo apt-get install build-essential libglfw3-dev libglew-dev
+
+- **Camera Models**: Perspective projection, field of view calculations
+
+- **Post-Processing**: Tone mapping (ACES), gamma correction, denoising filters- **Real-Time OpenGL Preview**: Instant visual feedback while editing scenes- UI/UX design with ImGui```bash
+
+
+
+### Software Engineering# Fedora
+
+- **Modern C++ Patterns**: Smart pointers, RAII, const correctness, move semantics
+
+- **Object-Oriented Design**: Polymorphic materials, abstract interfaces, clean architecturesudo dnf install gcc-c++ glfw-devel glew-devel- **ImGui Interface**: Professional, intuitive controls for all scene parameters
+
+- **Build Systems**: Makefiles, dependency management, modular compilation
+
+- **File I/O**: JSON parsing, scene serialization/deserialization
+
+
+
+### Graphics Programming# macOS- **3D Gizmo**: Interactive manipulation of objects in 3D space- Multi-threaded application architecture# Compiler le fichier courant
+
+- **OpenGL Pipeline**: Vertex buffers, shaders (GLSL), framebuffers
+
+- **Real-Time Rendering**: Depth testing, backface culling, wireframe renderingbrew install glfw glew
+
+- **UI/UX Development**: ImGui integration, event handling, user interaction patterns
+
+- **3D Mathematics**: Vector operations, matrix transformations, coordinate spaces```- **Camera Controls**: 
+
+
+
+### Tools & Workflow
+
+- **Version Control**: Git for iterative development
+
+- **Debugging**: GDB for C++ debugging, visual debugging techniques### Building the Project  - Orbit rotation with mouse drag- Software engineering best practicesg++ -std=c++17 -Wall -o test test.cpp
+
+- **Cross-Platform Development**: Writing portable C++ code
+
+
+
+---
+
+The project includes three main executables:  - Zoom with mouse wheel
+
+## 📊 Project Statistics
+
+
+
+- **Lines of Code**: ~3,500+ lines of C++
+
+- **Development Time**: Several weeks of intensive development#### 1. **Main Ray Tracer** (Command-line renderer)  - Pan with middle mouse button
+
+- **Files**: 30+ source files with modular architecture
+
+- **External Libraries**: 3 (ImGui, ImGuizmo, nlohmann/json)```bash
+
+
+
+---cd c++- **Ray Picking**: Click objects to select them directly in the viewport
+
+
+
+## 📚 Documentationmake main
+
+
+
+- **[BUILD.md](docs/BUILD.md)** - Detailed build instructions and troubleshooting./main- **Wireframe Mode**: Toggle between solid and wireframe rendering---# Avec optimisations
+
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Technical implementation details
+
+- **[ACHIEVEMENTS.md](docs/ACHIEVEMENTS.md)** - Project highlights and learning outcomes```
+
+
+
+---- **Scene Hierarchy**: Manage multiple objects with easy add/remove functionality
+
+
+
+## 🗺️ Future Enhancements#### 2. **Interactive Editor** (3D scene editor with OpenGL preview)
+
+
+
+- [ ] **Multi-Threading**: Parallel rendering for faster computation```bashg++ -std=c++17 -Wall -O3 -o test test.cpp
+
+- [ ] **Triangle Mesh Support**: Load and render OBJ/STL 3D models
+
+- [ ] **Texture Mapping**: UV coordinates and image-based texturescd c++
+
+- [ ] **BVH Acceleration**: Bounding Volume Hierarchy for 10-100x performance improvement
+
+- [ ] **Point Lights**: Explicit light sources with shadow raysmake editor### ⚙️ Rendering Configuration
+
+- [ ] **Advanced Materials**: Subsurface scattering, anisotropic reflections
+
+- [ ] **Post-Processing**: Bloom, depth of field, motion blur./editor
+
+- [ ] **GPU Acceleration**: CUDA or OpenCL implementation for real-time path tracing
+
+```- **Resolution Presets**: Quick selection from 480p to 4K (3840×2160)## ✨ Key Features```
+
+---
+
+
+
+## 📄 License
+
+#### 3. **Real-Time Preview** (OpenGL-only fast preview)- **Custom Resolution**: Fine-tune width and height independently
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+```bash
+
+---
+
+cd c++- **Quality Settings**:
+
+## 🙏 Acknowledgments
+
+make preview
+
+- **Ray Tracing in One Weekend** series by Peter Shirley for foundational concepts
+
+- **Dear ImGui** by Omar Cornut for the excellent immediate mode GUI library./preview  - Samples per pixel (1-1000+) for anti-aliasing quality
+
+- **ImGuizmo** by CedricGuillemet for 3D manipulation gizmos
+
+- **nlohmann/json** for elegant JSON parsing in C++```
+
+
+
+---  - Max ray bounce depth (1-50) for light transport accuracy### 🎨 Ray Tracing Engine### Utilisation du Makefile
+
+
+
+## 📬 Contact### Quick Render
+
+
+
+**Alex Amedro** - Looking for M1 internship opportunities in Computer Graphics, Game Development, or Software Engineering  - Gamma correction factor
+
+
+
+- GitHub: [@Alex-Amedro](https://github.com/Alex-Amedro)```bash
+
+- Project Link: [https://github.com/Alex-Amedro/Rayt](https://github.com/Alex-Amedro/Rayt)
+
+# Render with default settings- **Performance Options**: Configurable thread count for optimal CPU utilization- **Path Tracing**: Physically accurate light simulation with configurable bounce depth```bash
+
+---
+
+./main
+
+<p align="center">
+
+  <em>Built with ❤️ and lots of ☕ by Alex Amedro</em>
+
+</p>
 
 # The output will be saved as image.ppm
 
