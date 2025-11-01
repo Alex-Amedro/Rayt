@@ -1,38 +1,38 @@
 # Rayt - Ray Tracing Engine
 
-Moteur de ray tracing physiquement réaliste écrit en C++17 avec éditeur interactif OpenGL.
+Physically-based ray tracing engine written in C++17 with interactive OpenGL editor.
 
 ## Technologies
 
-- **Langage**: C++17
-- **Graphiques**: OpenGL 3.3+, GLFW, GLEW, GLM
+- **Language**: C++17
+- **Graphics**: OpenGL 3.3+, GLFW, GLEW, GLM
 - **Interface**: Dear ImGui, ImGuizmo
 - **Build**: Makefile (GCC/G++)
-- **Librairies**: nlohmann/json, STL
+- **Libraries**: nlohmann/json, STL
 
-## Fonctionnalités
+## Features
 
 ### Ray Tracing
-- Path tracing avec illumination globale
-- Géométries: sphères, plans infinis
-- Matériaux: diffus (Lambertian), métal, diélectrique (verre), émissif, miroir
+- Path tracing with global illumination
+- Geometries: spheres, infinite planes
+- Materials: diffuse (Lambertian), metal, dielectric (glass), emissive, mirror
 - Anti-aliasing (MSAA)
-- Tone mapping ACES
-- Correction gamma
-- Filtres de débruitage (box, Gaussian, bilateral)
+- ACES tone mapping
+- Gamma correction
+- Denoising filters (box, Gaussian, bilateral)
 
-### Éditeur Interactif
-- Prévisualisation temps réel OpenGL
-- Interface ImGui
-- Gizmo 3D pour manipuler les objets
-- Contrôles caméra (rotation, zoom, pan)
-- Ray picking pour sélection d'objets
-- Mode wireframe
-- Sérialisation JSON des scènes
+### Interactive Editor
+- Real-time OpenGL preview
+- ImGui interface
+- 3D gizmo for object manipulation
+- Camera controls (rotation, zoom, pan)
+- Ray picking for object selection
+- Wireframe mode
+- JSON scene serialization
 
 ## Installation
 
-### Dépendances
+### Dependencies
 
 ```bash
 # Ubuntu/Debian
@@ -45,50 +45,50 @@ sudo dnf install gcc-c++ glfw-devel glew-devel glm-devel
 brew install glfw glew glm
 ```
 
-### Compilation
+### Build
 
 ```bash
 cd c++
 
-# Éditeur interactif
+# Interactive editor
 make editor
 ./editor
 
-# Ray tracer ligne de commande
+# Command-line ray tracer
 make main
 ./main
 
-# Prévisualisation OpenGL
+# OpenGL preview
 make preview
 ./preview
 ```
 
-## Utilisation
+## Usage
 
-### Éditeur
+### Editor
 
-1. Lancer `./editor`
-2. Ajouter des objets (sphères, plans)
-3. Modifier les propriétés (position, couleur, matériaux)
-4. Configurer le rendu (résolution, samples, bounces)
-5. Sauvegarder la scène en JSON
-6. Lancer le rendu final (sortie: `image.ppm`)
+1. Run `./editor`
+2. Add objects (spheres, planes)
+3. Modify properties (position, color, materials)
+4. Configure rendering (resolution, samples, bounces)
+5. Save scene as JSON
+6. Launch final render (output: `image.ppm`)
 
-### Paramètres de rendu
+### Render Settings
 
-- **Résolution**: 480p à 4K (ou personnalisée)
-- **Samples per pixel**: qualité anti-aliasing (1-1000+)
-- **Max depth**: bounces de lumière (1-50)
-- **Gamma**: correction gamma
-- **Ambient**: lumière ambiante
+- **Resolution**: 480p to 4K (or custom)
+- **Samples per pixel**: anti-aliasing quality (1-1000+)
+- **Max depth**: light bounces (1-50)
+- **Gamma**: gamma correction
+- **Ambient**: ambient light
 
-### Matériaux
+### Materials
 
-- **Diffuse**: surfaces mates
-- **Metal**: surfaces métalliques (paramètre: rugosité)
-- **Dielectric**: matériaux transparents (paramètre: indice de réfraction)
-- **Emissive**: sources lumineuses
-- **Mirror**: réflexion spéculaire parfaite
+- **Diffuse**: matte surfaces
+- **Metal**: metallic surfaces (parameter: roughness)
+- **Dielectric**: transparent materials (parameter: refraction index)
+- **Emissive**: light sources
+- **Mirror**: perfect specular reflection
 
 ## Structure
 
@@ -97,32 +97,32 @@ c++/
 ├── src/
 │   ├── core/          # Ray tracing (Ray, Camera, Scene)
 │   ├── geometry/      # Primitives (Sphere, Plane)
-│   ├── materials/     # Matériaux
-│   ├── utils/         # Vec3, utilitaires
+│   ├── materials/     # Materials
+│   ├── utils/         # Vec3, utilities
 │   ├── rendering/     # Post-processing
-│   └── editor/        # Interface OpenGL/ImGui
+│   └── editor/        # OpenGL/ImGui interface
 ├── include/
-├── lib/               # Librairies externes
-└── data/save/         # Scènes sauvegardées
+├── lib/               # External libraries
+└── data/save/         # Saved scenes
 ```
 
 ## Makefile
 
 ```bash
-make          # Compile tout
-make main     # Compile le ray tracer
-make editor   # Compile l'éditeur
-make preview  # Compile la preview
-make clean    # Nettoie les builds
-make rebuild  # Recompile tout
+make          # Build all
+make main     # Build ray tracer
+make editor   # Build editor
+make preview  # Build preview
+make clean    # Clean builds
+make rebuild  # Rebuild all
 ```
 
 ## License
 
-MIT License - voir [LICENSE](LICENSE)
+MIT License - see [LICENSE](LICENSE)
 
-## Auteur
+## Author
 
-Alex Amedro - Recherche stage M1 en Computer Graphics / Game Development
+Alex Amedro - Looking for M1 internship in Computer Graphics / Game Development
 
 GitHub: [@Alex-Amedro](https://github.com/Alex-Amedro)
